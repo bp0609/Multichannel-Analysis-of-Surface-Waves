@@ -3,9 +3,14 @@
 Functions for loading SAC format seismic data
 """
 import os
+import sys
 import glob
 from obspy import read, Stream
 import numpy as np
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import DISTANCE_CORRECTION_FACTOR
 
 def load_geophydog_data(data_dir):
     """
@@ -36,7 +41,7 @@ def load_geophydog_data(data_dir):
     print(f"Loaded {len(stream)} traces")
     return stream
 
-def get_acquisition_geometry(stream):
+def get_acquisition_geometry(stream, apply_correction=True):
     """
     Extract acquisition geometry from stream
     
@@ -44,6 +49,8 @@ def get_acquisition_geometry(stream):
     -----------
     stream : obspy.Stream
         Stream containing traces
+    apply_correction : bool, optional
+        If True, apply DISTANCE_CORRECTION_FACTOR to distances (default: True)
     
     Returns:
     --------
@@ -63,6 +70,11 @@ def get_acquisition_geometry(stream):
         return None
     
     distances = np.array(distances)
+    
+    # Apply distance correction factor if requested
+    if apply_correction:
+        distances = distances * DISTANCE_CORRECTION_FACTOR
+        print(f"Applied distance correction factor: {DISTANCE_CORRECTION_FACTOR}")
     
     geometry = {
         'distances': distances,

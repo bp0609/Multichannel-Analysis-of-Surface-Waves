@@ -22,7 +22,12 @@ DEFAULT_VEL_MAX = 1000.0 # m/s
 # Acquisition geometry (Geophydog data)
 SOURCE_OFFSET = 10.0     # meters (x1)
 RECEIVER_SPACING = 1.0   # meters (dx)
-N_RECEIVERS = 24         # Number of geophones
+N_RECEIVERS = 60         # Number of geophones
+
+# Distance correction factor
+# SAC files have distances in km but stored as if they were m
+# Actual: x1=10m, dx=1m but SAC headers show 0.01m, 0.001m
+DISTANCE_CORRECTION_FACTOR = 1000.0  # Multiply SAC distances by this factor
 
 # Vs30 calculation
 VS30_DEPTH = 30.0        # meters
