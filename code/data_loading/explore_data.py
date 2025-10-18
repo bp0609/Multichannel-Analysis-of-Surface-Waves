@@ -15,7 +15,7 @@ import sys
 
 # Add project root to path
 sys.path.append('..')
-from config import RAW_DATA_DIR, FIGURES_DIR
+from config import RAW_DATA_DIR, FIGURES_DIR, DISTANCE_CORRECTION_FACTOR
 
 # Set matplotlib style
 plt.style.use('seaborn-v0_8-darkgrid')
@@ -84,10 +84,11 @@ def analyze_trace_info(stream):
         info['end_times'].append(tr.stats.endtime)
         
         # Distance info (if available in SAC header)
+        # Apply correction factor to convert from km (stored as m) to actual m
         if hasattr(tr.stats.sac, 'dist'):
-            info['distances'].append(tr.stats.sac.dist)
+            info['distances'].append(tr.stats.sac.dist * DISTANCE_CORRECTION_FACTOR)
         elif hasattr(tr.stats, 'distance'):
-            info['distances'].append(tr.stats.distance)
+            info['distances'].append(tr.stats.distance * DISTANCE_CORRECTION_FACTOR)
         
         # Print first trace details
         if i == 0:
@@ -244,7 +245,7 @@ def plot_shot_gather(stream, distances=None, save_path=None):
         distances = []
         for tr in stream:
             if hasattr(tr.stats.sac, 'dist'):
-                distances.append(tr.stats.sac.dist)
+                distances.append(tr.stats.sac.dist * DISTANCE_CORRECTION_FACTOR)
             else:
                 distances.append(0)
     
@@ -288,7 +289,7 @@ def plot_shot_gather(stream, distances=None, save_path=None):
     sorted_distances = distances[sort_idx]
     yticks = np.arange(len(stream))
     ax.set_yticks(yticks[::2])  # Every other trace to avoid crowding
-    ax.set_yticklabels([f'{sorted_distances[i]*1000:.1f} mm' for i in yticks[::2]])
+    ax.set_yticklabels([f'{sorted_distances[i]:.1f} m' for i in yticks[::2]])
     
     ax.grid(True, alpha=0.3)
     ax.set_xlim(0, time[-1])
@@ -341,14 +342,14 @@ def plot_individual_traces(stream, n_traces=6, save_path=None):
         tr = stream[idx]
         time = np.arange(tr.stats.npts) * tr.stats.delta
         
-        # Get distance
+        # Get distance (apply correction factor)
         dist = 0
         if hasattr(tr.stats.sac, 'dist'):
-            dist = tr.stats.sac.dist
+            dist = tr.stats.sac.dist * DISTANCE_CORRECTION_FACTOR
         
         # Plot
         axes[i].plot(time, tr.data, 'k-', linewidth=0.8)
-        axes[i].set_ylabel(f'Trace {idx}\n{dist:.0f} m', fontsize=9)
+        axes[i].set_ylabel(f'Trace {idx}\n{dist:.1f} m', fontsize=9)
         axes[i].grid(True, alpha=0.3)
         
         # Only show x-label on bottom plot
@@ -620,11 +621,11 @@ def plot_acquisition_geometry(stream, save_path=None):
         Path to save figure
     """
     
-    # Extract distances
+    # Extract distances (apply correction factor)
     distances = []
     for tr in stream:
         if hasattr(tr.stats.sac, 'dist'):
-            distances.append(tr.stats.sac.dist)
+            distances.append(tr.stats.sac.dist * DISTANCE_CORRECTION_FACTOR)
         else:
             distances.append(0)
     
