@@ -457,7 +457,155 @@ fig_freq = plot_frequency_content(
 )
 
 # ============================================
-# 7. ACQUISITION GEOMETRY VERIFICATION
+# 7. COMPREHENSIVE FREQUENCY ANALYSIS
+# ============================================
+
+def plot_comprehensive_frequency_analysis(stream, distances=None, save_path=None):
+    """
+    Comprehensive frequency content analysis of the data
+    
+    This function creates a detailed multi-panel visualization showing:
+    - Individual amplitude spectra with mean and standard deviation
+    - Log-scale spectrum for dynamic range analysis
+    - Dominant frequency distribution across all traces
+    - Frequency-offset spectrogram showing spectral variation with distance
+    
+    Parameters:
+    -----------
+    stream : obspy.Stream
+        Stream containing all traces
+    distances : array-like, optional
+        Distances for each trace (m)
+    save_path : str, optional
+        Path to save figure
+    """
+    
+    # Get distances if not provided
+    if distances is None:
+        distances = []
+        for tr in stream:
+            if hasattr(tr.stats.sac, 'dist'):
+                distances.append(tr.stats.sac.dist)
+            else:
+                distances.append(0)
+    
+    distances = np.array(distances)
+    
+    # Get basic info
+    tr = stream[0]
+    npts = tr.stats.npts
+    delta = tr.stats.delta
+    
+    # Create figure with custom grid
+    fig = plt.figure(figsize=(16, 12))
+    gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
+    
+    # Compute amplitude spectrum for each trace
+    freqs = np.fft.rfftfreq(npts, delta)
+    
+    # Stack all spectra
+    amp_spectra = []
+    for tr in stream:
+        fft = np.fft.rfft(tr.data)
+        amp = np.abs(fft)
+        amp_spectra.append(amp)
+    
+    amp_spectra = np.array(amp_spectra)
+    mean_spectrum = amp_spectra.mean(axis=0)
+    std_spectrum = amp_spectra.std(axis=0)
+    
+    # Plot 1: Individual spectra with mean
+    ax1 = fig.add_subplot(gs[0, :])
+    for amp in amp_spectra[::3]:  # Plot every 3rd trace to avoid overcrowding
+        ax1.plot(freqs, amp, 'b', alpha=0.05, linewidth=0.5)
+    ax1.plot(freqs, mean_spectrum, 'r', linewidth=2.5, label='Mean Spectrum', zorder=10)
+    ax1.fill_between(freqs, mean_spectrum - std_spectrum, mean_spectrum + std_spectrum,
+                     color='red', alpha=0.2, label='±1 Std Dev')
+    ax1.set_xlabel('Frequency (Hz)', fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Amplitude', fontsize=12, fontweight='bold')
+    ax1.set_title('Amplitude Spectra - All Traces', fontsize=14, fontweight='bold')
+    ax1.legend(fontsize=11, loc='upper right')
+    ax1.grid(True, alpha=0.3, linestyle='--')
+    ax1.set_xlim([0, 100])  # Focus on 0-100 Hz
+    
+    # Plot 2: Log scale spectrum
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax2.semilogy(freqs, mean_spectrum, 'r', linewidth=2)
+    ax2.set_xlabel('Frequency (Hz)', fontsize=12, fontweight='bold')
+    ax2.set_ylabel('Amplitude (log scale)', fontsize=12, fontweight='bold')
+    ax2.set_title('Mean Amplitude Spectrum (Log)', fontsize=13, fontweight='bold')
+    ax2.grid(True, alpha=0.3, which='both', linestyle='--')
+    ax2.set_xlim([1, 100])
+    
+    # Plot 3: Dominant frequency analysis
+    ax3 = fig.add_subplot(gs[1, 1])
+    dominant_freqs = []
+    for amp in amp_spectra:
+        # Find dominant frequency (peak in 5-50 Hz range)
+        freq_mask = (freqs > 5) & (freqs < 50)
+        if np.any(freq_mask):
+            idx = np.argmax(amp[freq_mask])
+            dominant_freqs.append(freqs[freq_mask][idx])
+    
+    ax3.hist(dominant_freqs, bins=30, color='steelblue', edgecolor='black', alpha=0.7)
+    ax3.axvline(np.mean(dominant_freqs), color='red', linestyle='--', 
+                linewidth=2, label=f'Mean: {np.mean(dominant_freqs):.1f} Hz')
+    ax3.set_xlabel('Dominant Frequency (Hz)', fontsize=12, fontweight='bold')
+    ax3.set_ylabel('Count', fontsize=12, fontweight='bold')
+    ax3.set_title('Distribution of Dominant Frequencies', fontsize=13, fontweight='bold')
+    ax3.legend(fontsize=10)
+    ax3.grid(True, alpha=0.3, axis='y', linestyle='--')
+    
+    # Plot 4: Spectrogram (frequency content over offset)
+    ax4 = fig.add_subplot(gs[2, :])
+    
+    # Sort by distance for proper display
+    sort_idx = np.argsort(distances)
+    sorted_distances = distances[sort_idx]
+    sorted_spectra = amp_spectra[sort_idx]
+    
+    # Create frequency-offset spectrogram
+    freq_range = (freqs > 0) & (freqs < 50)
+    spec_data = sorted_spectra[:, freq_range].T
+    
+    extent = [sorted_distances.min(), sorted_distances.max(), 
+              freqs[freq_range].min(), freqs[freq_range].max()]
+    im = ax4.imshow(spec_data, aspect='auto', cmap='viridis', 
+                    extent=extent, origin='lower', interpolation='bilinear')
+    ax4.set_xlabel('Offset (m)', fontsize=12, fontweight='bold')
+    ax4.set_ylabel('Frequency (Hz)', fontsize=12, fontweight='bold')
+    ax4.set_title('Amplitude Spectrum vs Offset', fontsize=13, fontweight='bold')
+    cbar = plt.colorbar(im, ax=ax4, label='Amplitude')
+    cbar.set_label('Amplitude', fontsize=11, fontweight='bold')
+    ax4.grid(True, alpha=0.3, color='white', linestyle='--')
+    
+    # Add overall title
+    fig.suptitle('Comprehensive Frequency Analysis', 
+                 fontsize=16, fontweight='bold', y=0.995)
+    
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Figure saved: {save_path}")
+    
+    plt.show()
+    
+    return fig
+
+# Perform comprehensive frequency analysis
+print("\n" + "=" * 60)
+print("COMPREHENSIVE FREQUENCY ANALYSIS")
+print("=" * 60)
+
+fig_freq_comprehensive = plot_comprehensive_frequency_analysis(
+    stream,
+    distances=info['distances'],
+    save_path=os.path.join(FIGURES_DIR, 'frequency_analysis_comprehensive.png')
+)
+
+# ============================================
+# 8. ACQUISITION GEOMETRY VERIFICATION
 # ============================================
 
 def plot_acquisition_geometry(stream, save_path=None):
@@ -570,5 +718,6 @@ print("\nGenerated figures:")
 print("  1. shot_gather_raw.png")
 print("  2. individual_traces.png")
 print("  3. frequency_content.png")
-print("  4. acquisition_geometry.png")
+print("  4. frequency_analysis_comprehensive.png")
+print("  5. acquisition_geometry.png")
 print("\nProceed to Phase 3.2: Preprocessing")
