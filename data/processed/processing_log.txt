@@ -1,0 +1,28 @@
+
+MASW DATA PREPROCESSING LOG
+========================================
+
+Input Data:
+  - Source: Geophydog synthetic data
+  - Number of traces: 60
+  - Sampling rate: 512.006591796875 Hz
+  - Duration: 8.000 s
+  - Source offset: 10.0 m
+  - Receiver spacing: 1.0 m
+  - Array length: 59.0 m
+
+Processing Steps Applied:
+  1. Bandpass Filter: 5-50 Hz (4 corners, zero-phase)
+  2. Normalization: trace-by-trace (each trace to its maximum)
+  3. Spectral Whitening: Not applied
+
+Output:
+  - Processed traces saved to: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/processed
+  - Number of output files: 60
+  
+Quality Notes:
+  - All traces processed successfully
+  - No NaN or Inf values in output
+  - Ready for dispersion analysis
+
+Date: 2025-10-19 22:53:16
