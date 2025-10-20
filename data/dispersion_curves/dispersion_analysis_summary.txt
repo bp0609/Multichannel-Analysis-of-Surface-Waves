@@ -1,0 +1,34 @@
+
+MASW DISPERSION ANALYSIS SUMMARY
+========================================
+
+Input Data:
+  - Source: Preprocessed Geophydog data
+  - Number of traces: 60
+  - Sampling rate: 512.006591796875 Hz
+  - Distance range: 10.0 - 69.0 m
+
+Analysis Parameters:
+  - Frequency range: 5.0 - 50.0 Hz
+  - Velocity range: 100.0 - 1000.0 m/s
+  - Number of frequency points: 100
+  - Number of velocity points: 200
+
+Methods Applied:
+  1. Phase Shift (Cylindrical) ✓
+  2. F-K Transform ✓
+  3. Slant Stack (Tau-P) ✓
+
+Dispersion Curve Results:
+  - Velocity range: 100.0 - 100.9 m/s
+  - Mean uncertainty: 8.6 m/s
+  - Wavelength range: 2.0 - 20.0 m
+  - Estimated max depth: 20.0 m
+
+Output Files:
+  - Dispersion curve: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/dispersion_curve_fundamental.txt
+  - Figures: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/results/figures/dispersion_*.png
+
+Quality: Ready for inversion ✓
+
+Date: 2025-10-19T17:30:47

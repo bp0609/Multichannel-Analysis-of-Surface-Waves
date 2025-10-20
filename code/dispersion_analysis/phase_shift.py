@@ -176,8 +176,8 @@ def fk_transform(data, dt, dx, freq_range=None, vel_range=None):
     
     for i in range(len(freqs_pos)):
         # Extract velocity and amplitude for this frequency
-        v_slice = V[:, i]
-        amp_slice = fk_amplitude_pos[:, i]
+        v_slice = V[i, :]  # Shape: (n_wavenumbers,)
+        amp_slice = fk_amplitude_pos[:, i]  # Shape: (n_traces,)
         
         # Interpolate to regular velocity grid
         valid = np.isfinite(v_slice) & (v_slice > 0)

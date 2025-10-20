@@ -1,0 +1,109 @@
+
+======================================================================
+MASW SITE CHARACTERIZATION REPORT
+======================================================================
+
+Project: MASW Vs30 Analysis
+Date: 2025-10-19T18:29:52
+
+======================================================================
+1. SHEAR WAVE VELOCITY PROFILE
+======================================================================
+
+Layer Parameters:
+----------------------------------------------------------------------
+Layer    Thickness(m)    Vs(m/s)      Vp(m/s)      Rho(g/cm³)  
+----------------------------------------------------------------------
+1        22.72           109.1        188.8        0.20        
+2        39.24           131.7        227.9        0.21        
+3        5.39            207.8        359.4        0.24        
+4        18.83           641.5        1109.8       0.32        
+5        20.73           670.8        1160.5       0.32        
+6        ∞ (half-space)  1144.0       1979.1       0.37        
+
+======================================================================
+2. Vs30 CALCULATION
+======================================================================
+
+Vs30 = 30m / Σ(hi/Vsi) = 113.8 m/s
+
+Time-Averaged Velocities:
+  Vs10 = 109.1 m/s
+  Vs15 = 109.1 m/s
+  Vs20 = 109.1 m/s
+  Vs30 = 113.8 m/s
+
+Vs30 Uncertainty (from 100 models):
+  Mean = 113.7 m/s
+  Std Dev = 7.8 m/s
+  95% CI = [98.4, 129.0] m/s
+  CoV = 6.8%
+
+======================================================================
+3. SITE CLASSIFICATION
+======================================================================
+
+NEHRP (ASCE 7-22) Site Classification:
+----------------------------------------------------------------------
+  Site Class: E
+  Description: Soft Soil
+  
+  Site Coefficients (for design spectrum):
+    Fa (short period) = 2.50
+    Fv (long period) = 3.50
+
+NEHRP Extended Classification (9 classes):
+----------------------------------------------------------------------
+  Site Class: E
+  Description: Soft Soil
+
+Eurocode 8 Classification:
+----------------------------------------------------------------------
+  Ground Type: D
+  Description: Loose to medium sand, gravel, or soft clay
+
+======================================================================
+4. ENGINEERING INTERPRETATION
+======================================================================
+
+Site Characteristics:
+
+  Site Type: SOFT SOIL
+  
+  Engineering Considerations:
+  - High amplification of seismic ground motions expected
+  - Potential for significant site effects
+  - May require site-specific seismic hazard analysis
+  - Consider ground improvement for critical structures
+  - Higher liquefaction susceptibility if saturated cohesionless soils present
+  - Foundation design should account for potential large settlements
+
+======================================================================
+5. QUALITY METRICS
+======================================================================
+
+Depth of Investigation:
+  Maximum wavelength: 22.8 m (at 5 Hz)
+  Estimated max depth: 22.8 m
+  Coverage for Vs30: LIMITED (<30m)
+
+Velocity Range:
+  Surface Vs: 109.1 m/s
+  Minimum Vs: 109.1 m/s
+  Maximum Vs: 1144.0 m/s
+
+======================================================================
+6. REFERENCES
+======================================================================
+
+ASCE 7-22: Minimum Design Loads and Associated Criteria for Buildings 
+            and Other Structures
+
+NEHRP: Recommended Seismic Provisions for New Buildings and Other 
+       Structures (FEMA P-2082)
+
+Eurocode 8: Design of structures for earthquake resistance
+
+======================================================================
+END OF REPORT
+======================================================================
