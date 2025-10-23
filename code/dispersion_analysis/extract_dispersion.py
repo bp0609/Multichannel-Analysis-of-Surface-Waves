@@ -15,11 +15,9 @@ import glob
 
 # Add project paths
 sys.path.append('..')
-from config import PROCESSED_DATA_DIR, DISPERSION_DIR, FIGURES_DIR, DISTANCE_CORRECTION_FACTOR
+from config import RAW_DATA_DIR, DISPERSION_DIR, FIGURES_DIR, DISTANCE_CORRECTION_FACTOR
 from dispersion_analysis.phase_shift import (
     phase_shift_transform,
-    fk_transform,
-    slant_stack_transform,
     plot_dispersion_image,
     automatic_picking,
     interactive_picking
@@ -37,7 +35,7 @@ print("LOADING PREPROCESSED DATA")
 print("=" * 60)
 
 # Load all processed SAC files
-sac_files = sorted(glob.glob(os.path.join(PROCESSED_DATA_DIR, "*.sac")))
+sac_files = sorted(glob.glob(os.path.join(RAW_DATA_DIR, "*.sac")))
 print(f"Found {len(sac_files)} processed files")
 
 # Read into obspy stream
@@ -89,15 +87,15 @@ print(f"Receiver spacing: {np.median(np.diff(distances)):.2f} m")
 # ============================================
 
 # Frequency range for analysis (Hz)
-freq_min = 5.0
+freq_min = 1.0
 freq_max = 50.0
-n_freqs = 100
+n_freqs = 500
 frequencies = np.linspace(freq_min, freq_max, n_freqs)
 
 # Velocity range for analysis (m/s)
-vel_min = 100.0
-vel_max = 1000.0
-n_vels = 200
+vel_min = 1
+vel_max = 500.0
+n_vels = 500
 velocities = np.linspace(vel_min, vel_max, n_vels)
 
 print(f"\nAnalysis parameters:")
@@ -105,68 +103,14 @@ print(f"  Frequency range: {freq_min} - {freq_max} Hz ({n_freqs} points)")
 print(f"  Velocity range: {vel_min} - {vel_max} m/s ({n_vels} points)")
 
 # ============================================
-# 4. COMPUTE DISPERSION IMAGES - PHASE SHIFT METHOD
+# 4. COMPUTE DISPERSION IMAGE - PHASE SHIFT METHOD
 # ============================================
 
 print("\n" + "=" * 60)
-print("METHOD 1: PHASE SHIFT (CYLINDRICAL WAVEFRONT)")
+print("PHASE SHIFT METHOD (Geophydog f-c transform)")
 print("=" * 60)
 
-dispersion_ps = phase_shift_transform(
-    data=data,
-    dt=dt,
-    offsets=distances,
-    frequencies=frequencies,
-    velocities=velocities,
-    wave_type='cylindrical'
-)
-
-# Plot phase shift result
-fig_ps = plot_dispersion_image(
-    dispersion_ps,
-    frequencies,
-    velocities,
-    title="Dispersion Image - Phase Shift Method (Cylindrical)",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_phase_shift.png')
-)
-
-# ============================================
-# 5. COMPUTE DISPERSION IMAGES - F-K TRANSFORM
-# ============================================
-
-print("\n" + "=" * 60)
-print("METHOD 2: F-K TRANSFORM")
-print("=" * 60)
-
-# Calculate receiver spacing
-dx = np.median(np.diff(distances))
-
-dispersion_fk, freqs_fk, vels_fk = fk_transform(
-    data=data,
-    dt=dt,
-    dx=dx,
-    freq_range=(freq_min, freq_max),
-    vel_range=(vel_min, vel_max)
-)
-
-# Plot f-k result
-fig_fk = plot_dispersion_image(
-    dispersion_fk,
-    freqs_fk,
-    vels_fk,
-    title="Dispersion Image - F-K Transform",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_fk.png')
-)
-
-# ============================================
-# 6. COMPUTE DISPERSION IMAGES - SLANT STACK
-# ============================================
-
-print("\n" + "=" * 60)
-print("METHOD 3: SLANT STACK (TAU-P)")
-print("=" * 60)
-
-dispersion_ss = slant_stack_transform(
+dispersion_image = phase_shift_transform(
     data=data,
     dt=dt,
     offsets=distances,
@@ -174,79 +118,25 @@ dispersion_ss = slant_stack_transform(
     velocities=velocities
 )
 
-# Plot slant-stack result
-fig_ss = plot_dispersion_image(
-    dispersion_ss,
+# Plot phase shift result
+fig_ps = plot_dispersion_image(
+    dispersion_image,
     frequencies,
     velocities,
-    title="Dispersion Image - Slant Stack (Tau-P)",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_slant_stack.png')
+    title="Dispersion Image - Phase Shift Method",
+    save_path=os.path.join(FIGURES_DIR, 'dispersion_phase_shift.png')
 )
 
 # ============================================
-# 7. COMPARE ALL METHODS
-# ============================================
-
-def compare_methods(disp_ps, disp_fk, disp_ss, frequencies, velocities, 
-                    save_path=None):
-    """Compare dispersion images from different methods"""
-    
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    
-    methods = [
-        (disp_ps, "Phase Shift"),
-        (disp_fk, "F-K Transform"),
-        (disp_ss, "Slant Stack")
-    ]
-    
-    extent = [velocities.min(), velocities.max(), 
-              frequencies.min(), frequencies.max()]
-    
-    for ax, (disp, title) in zip(axes, methods):
-        im = ax.imshow(disp, aspect='auto', origin='lower',
-                      extent=extent, cmap='jet', interpolation='bilinear')
-        ax.set_xlabel('Phase Velocity (m/s)', fontweight='bold')
-        ax.set_ylabel('Frequency (Hz)', fontweight='bold')
-        ax.set_title(title, fontweight='bold', fontsize=12)
-        ax.grid(True, alpha=0.3, linestyle='--', color='white')
-        plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-    
-    fig.suptitle('Comparison of Dispersion Extraction Methods', 
-                 fontsize=14, fontweight='bold', y=1.02)
-    plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"Figure saved: {save_path}")
-    
-    plt.show()
-    
-    return fig
-
-print("\n" + "=" * 60)
-print("COMPARING ALL METHODS")
-print("=" * 60)
-
-fig_compare = compare_methods(
-    dispersion_ps,
-    dispersion_fk,
-    dispersion_ss,
-    frequencies,
-    velocities,
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_comparison.png')
-)
-
-# ============================================
-# 8. AUTOMATIC PICKING OF DISPERSION CURVE
+# 5. AUTOMATIC PICKING OF DISPERSION CURVE
 # ============================================
 
 print("\n" + "=" * 60)
 print("AUTOMATIC DISPERSION CURVE PICKING")
 print("=" * 60)
 
-# Use phase shift method (typically most reliable)
 picked_velocities, uncertainties = automatic_picking(
-    dispersion_ps,
+    dispersion_image,
     frequencies,
     velocities,
     smooth_window=5,
@@ -255,7 +145,7 @@ picked_velocities, uncertainties = automatic_picking(
 
 # Plot with picked curve
 fig_picked = plot_dispersion_image(
-    dispersion_ps,
+    dispersion_image,
     frequencies,
     velocities,
     picked_curve=picked_velocities,
@@ -271,7 +161,7 @@ np.savetxt(dispersion_file, dispersion_data, header=header, fmt='%.4f')
 print(f"\nDispersion curve saved to: {dispersion_file}")
 
 # ============================================
-# 9. PLOT DISPERSION CURVE IN DIFFERENT FORMATS
+# 6. PLOT DISPERSION CURVE IN DIFFERENT FORMATS
 # ============================================
 
 def plot_dispersion_curve_formats(frequencies, velocities, uncertainties,
@@ -355,7 +245,7 @@ fig_formats = plot_dispersion_curve_formats(
 )
 
 # ============================================
-# 10. QUALITY ASSESSMENT
+# 7. QUALITY ASSESSMENT
 # ============================================
 
 def assess_dispersion_quality(frequencies, velocities, uncertainties,
@@ -423,10 +313,10 @@ def assess_dispersion_quality(frequencies, velocities, uncertainties,
 
 # Run quality assessment
 assess_dispersion_quality(frequencies, picked_velocities, 
-                         uncertainties, dispersion_ps)
+                         uncertainties, dispersion_image)
 
 # ============================================
-# 11. OPTIONAL: INTERACTIVE PICKING
+# 8. OPTIONAL: INTERACTIVE PICKING
 # ============================================
 
 print("\n" + "=" * 60)
@@ -438,7 +328,7 @@ run_interactive = False  # Set to True if you want interactive picking
 
 if run_interactive:
     picked_curves_manual = interactive_picking(
-        dispersion_ps,
+        dispersion_image,
         frequencies,
         velocities,
         n_modes=1,
@@ -446,7 +336,7 @@ if run_interactive:
     )
 
 # ============================================
-# 12. SAVE ANALYSIS SUMMARY
+# 9. SAVE ANALYSIS SUMMARY
 # ============================================
 
 summary = f"""
@@ -465,10 +355,8 @@ Analysis Parameters:
   - Number of frequency points: {n_freqs}
   - Number of velocity points: {n_vels}
 
-Methods Applied:
-  1. Phase Shift (Cylindrical) ✓
-  2. F-K Transform ✓
-  3. Slant Stack (Tau-P) ✓
+Method Applied:
+  - Phase Shift (Geophydog f-c transform) ✓
 
 Dispersion Curve Results:
   - Velocity range: {picked_velocities.min():.1f} - {picked_velocities.max():.1f} m/s

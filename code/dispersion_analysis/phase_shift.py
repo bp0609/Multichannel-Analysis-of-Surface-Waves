@@ -2,6 +2,7 @@
 
 """
 Phase Shift Method for MASW Dispersion Curve Extraction
+Based on Geophydog's masw_fc_trans implementation
 """
 
 import numpy as np
@@ -9,10 +10,12 @@ from scipy import signal
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-def phase_shift_transform(data, dt, offsets, frequencies, velocities, 
-                         wave_type='cylindrical'):
+def phase_shift_transform(data, dt, offsets, frequencies, velocities):
     """
-    Phase shift method to extract dispersion curves
+    Phase shift method to extract dispersion curves (f-c transform)
+    
+    Based on Geophydog's masw_fc_trans implementation.
+    Uses phase-only stacking (normalized FFT) for dispersion analysis.
     
     Parameters:
     -----------
@@ -26,9 +29,6 @@ def phase_shift_transform(data, dt, offsets, frequencies, velocities,
         Frequency array to analyze (Hz)
     velocities : ndarray
         Trial phase velocities (m/s)
-    wave_type : str
-        'plane' for plane wave assumption
-        'cylindrical' for point source (more accurate for MASW)
     
     Returns:
     --------
@@ -36,238 +36,61 @@ def phase_shift_transform(data, dt, offsets, frequencies, velocities,
         2D array (frequencies x velocities) with normalized energy
     """
     
-    n_traces, n_samples = data.shape
-    n_freqs = len(frequencies)
-    n_vels = len(velocities)
+    m, n = data.shape
+    fs = 1.0 / dt
     
-    # Initialize dispersion image
-    dispersion_image = np.zeros((n_freqs, n_vels))
+    # Get frequency bounds from input
+    f1 = frequencies[0]
+    f2 = frequencies[-1]
     
-    # Compute FFT of all traces
-    fft_data = np.fft.rfft(data, axis=1)
-    freq_axis = np.fft.rfftfreq(n_samples, dt)
+    # Frequency array
+    f = np.arange(n) * fs / (n - 1)
+    
+    # Get frequency indices for f1..f2
+    fn1 = int(max(0, np.floor(f1 * (n-1) / fs)))
+    fn2 = int(min(n - 1, np.ceil(f2 * (n-1) / fs)))
+    
+    w = 2.0 * np.pi * f
     
     print("Computing phase shift transform...")
     
-    # Loop over each trial frequency
-    for i, f in enumerate(tqdm(frequencies, desc="Frequencies")):
-        # Find nearest frequency bin
-        f_idx = np.argmin(np.abs(freq_axis - f))
-        
-        # Extract complex amplitudes at this frequency
-        U = fft_data[:, f_idx]
-        
-        # Loop over each trial velocity
-        for j, c in enumerate(velocities):
-            # Calculate phase shifts for each receiver
-            if wave_type == 'plane':
-                # Plane wave assumption
-                phase_shifts = 2 * np.pi * f * offsets / c
-            else:  # cylindrical
-                # Point source (cylindrical wave) - more accurate
-                # Include amplitude correction for geometric spreading
-                amp_correction = 1.0 / np.sqrt(offsets)
-                phase_shifts = 2 * np.pi * f * offsets / c
-                U_corrected = U * amp_correction
-                U = U_corrected
-            
-            # Apply phase shifts and sum coherently
-            shifted = U * np.exp(-1j * phase_shifts)
-            stacked = np.sum(shifted)
-            
-            # Store normalized energy (power)
-            dispersion_image[i, j] = np.abs(stacked) ** 2
+    # FFT of each trace
+    fft_d = np.zeros((m, n), dtype=np.complex128)
+    for i in range(m):
+        fft_d[i] = np.fft.fft(data[i])
     
-    # Normalize each frequency slice
-    for i in range(n_freqs):
-        max_val = dispersion_image[i, :].max()
-        if max_val > 0:
-            dispersion_image[i, :] /= max_val
+    # Normalize by magnitude (phase-only stack)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        fft_d = fft_d / np.abs(fft_d)
+    fft_d[np.isnan(fft_d)] = 0.0
+    
+    # Initialize output
+    fc = np.zeros((len(velocities), fn2 - fn1 + 1), dtype=np.float64)
+    
+    # Phase shift stack
+    for ci, cc in enumerate(tqdm(velocities, desc="Velocities")):
+        for fi in range(fn1, fn2 + 1):
+            # exp(i * w / c * dist)
+            phase_delays = np.exp(1j * w[fi] / cc * offsets)
+            # sum across channels
+            val = np.abs(np.sum(phase_delays * fft_d[:, fi]))
+            fc[ci, fi - fn1] = val
+    
+    # Normalize for plotting
+    norm = np.abs(fc).max()
+    if norm > 0:
+        fc = fc / norm
+    
+    # Interpolate to requested frequency grid
+    freqs_computed = f[fn1:fn2 + 1]
+    
+    # Create output dispersion image matching requested dimensions
+    dispersion_image = np.zeros((len(frequencies), len(velocities)))
+    
+    for j in range(len(velocities)):
+        dispersion_image[:, j] = np.interp(frequencies, freqs_computed, fc[j, :])
     
     print("Phase shift transform complete!")
-    
-    return dispersion_image
-
-
-def fk_transform(data, dt, dx, freq_range=None, vel_range=None):
-    """
-    Frequency-wavenumber (f-k) transform method
-    
-    Parameters:
-    -----------
-    data : ndarray
-        Seismic data array (n_traces x n_samples)
-    dt : float
-        Time sampling interval (s)
-    dx : float
-        Spatial sampling interval (m)
-    freq_range : tuple, optional
-        (fmin, fmax) in Hz
-    vel_range : tuple, optional
-        (vmin, vmax) in m/s
-    
-    Returns:
-    --------
-    dispersion_image : ndarray
-        2D array with dispersion image
-    frequencies : ndarray
-        Frequency array
-    velocities : ndarray
-        Velocity array
-    """
-    
-    n_traces, n_samples = data.shape
-    
-    # 2D FFT
-    print("Computing 2D FFT (f-k transform)...")
-    fk_spectrum = np.fft.fft2(data)
-    fk_spectrum = np.fft.fftshift(fk_spectrum, axes=0)
-    
-    # Frequency and wavenumber axes
-    freqs = np.fft.fftfreq(n_samples, dt)
-    freqs = np.fft.fftshift(freqs)
-    
-    wavenumbers = np.fft.fftfreq(n_traces, dx)
-    wavenumbers = np.fft.fftshift(wavenumbers)
-    
-    # Take absolute value and focus on positive frequencies
-    fk_amplitude = np.abs(fk_spectrum)
-    
-    # Select positive frequencies only
-    pos_freq_idx = freqs > 0
-    freqs_pos = freqs[pos_freq_idx]
-    fk_amplitude_pos = fk_amplitude[:, pos_freq_idx]
-    
-    # Convert wavenumber to velocity: v = 2*pi*f/k
-    # Create meshgrid
-    K, F = np.meshgrid(wavenumbers, freqs_pos)
-    
-    # Avoid division by zero
-    K_safe = K.copy()
-    K_safe[K_safe == 0] = 1e-10
-    
-    # Calculate velocities
-    V = 2 * np.pi * F / K_safe
-    
-    # Filter by velocity range if specified
-    if vel_range is not None:
-        vmin, vmax = vel_range
-        valid = (V >= vmin) & (V <= vmax)
-        fk_amplitude_pos[~valid.T] = 0
-    
-    # Filter by frequency range if specified
-    if freq_range is not None:
-        fmin, fmax = freq_range
-        valid_f = (freqs_pos >= fmin) & (freqs_pos <= fmax)
-        fk_amplitude_pos[:, ~valid_f] = 0
-    
-    # Interpolate to regular velocity grid
-    if vel_range is not None:
-        vmin, vmax = vel_range
-    else:
-        vmin, vmax = 100, 1000
-    
-    velocities = np.linspace(vmin, vmax, 200)
-    
-    # Create dispersion image by resampling
-    from scipy.interpolate import griddata
-    
-    dispersion_image = np.zeros((len(freqs_pos), len(velocities)))
-    
-    for i in range(len(freqs_pos)):
-        # Extract velocity and amplitude for this frequency
-        v_slice = V[i, :]  # Shape: (n_wavenumbers,)
-        amp_slice = fk_amplitude_pos[:, i]  # Shape: (n_traces,)
-        
-        # Interpolate to regular velocity grid
-        valid = np.isfinite(v_slice) & (v_slice > 0)
-        if np.sum(valid) > 0:
-            dispersion_image[i, :] = np.interp(velocities, 
-                                               v_slice[valid], 
-                                               amp_slice[valid],
-                                               left=0, right=0)
-    
-    # Normalize
-    for i in range(len(freqs_pos)):
-        max_val = dispersion_image[i, :].max()
-        if max_val > 0:
-            dispersion_image[i, :] /= max_val
-    
-    print("F-K transform complete!")
-    
-    return dispersion_image, freqs_pos, velocities
-
-
-def slant_stack_transform(data, dt, offsets, frequencies, velocities):
-    """
-    Slant-stack (tau-p) transform method
-    
-    Parameters:
-    -----------
-    data : ndarray
-        Seismic data array (n_traces x n_samples)
-    dt : float
-        Time sampling interval (s)
-    offsets : ndarray
-        Source-receiver distances (m)
-    frequencies : ndarray
-        Frequency array (Hz)
-    velocities : ndarray
-        Phase velocity array (m/s)
-    
-    Returns:
-    --------
-    dispersion_image : ndarray
-        2D dispersion image
-    """
-    
-    n_traces, n_samples = data.shape
-    time = np.arange(n_samples) * dt
-    
-    n_freqs = len(frequencies)
-    n_vels = len(velocities)
-    
-    dispersion_image = np.zeros((n_freqs, n_vels))
-    
-    print("Computing slant-stack transform...")
-    
-    for j, c in enumerate(tqdm(velocities, desc="Velocities")):
-        # Slowness (s/m)
-        p = 1.0 / c
-        
-        # Stack along moveout curve
-        stacked_trace = np.zeros(n_samples)
-        
-        for i, offset in enumerate(offsets):
-            # Time shift for this offset
-            time_shift = offset * p
-            
-            # Shift trace
-            if time_shift < time[-1]:
-                shifted = np.interp(time - time_shift, time, data[i, :], 
-                                   left=0, right=0)
-                stacked_trace += shifted
-        
-        # Average
-        stacked_trace /= n_traces
-        
-        # Compute amplitude spectrum of stacked trace
-        fft_stack = np.fft.rfft(stacked_trace)
-        freq_axis = np.fft.rfftfreq(n_samples, dt)
-        amp_spectrum = np.abs(fft_stack)
-        
-        # Extract amplitudes at desired frequencies
-        for i, f in enumerate(frequencies):
-            f_idx = np.argmin(np.abs(freq_axis - f))
-            dispersion_image[i, j] = amp_spectrum[f_idx]
-    
-    # Normalize each frequency
-    for i in range(n_freqs):
-        max_val = dispersion_image[i, :].max()
-        if max_val > 0:
-            dispersion_image[i, :] /= max_val
-    
-    print("Slant-stack transform complete!")
     
     return dispersion_image
 
@@ -300,27 +123,28 @@ def plot_dispersion_image(dispersion_image, frequencies, velocities,
     
     fig, ax = plt.subplots(figsize=(12, 8))
     
-    # Plot dispersion image
-    extent = [velocities.min(), velocities.max(), 
-              frequencies.min(), frequencies.max()]
+    # Plot dispersion image (exchange x and y axes)
+    extent = [frequencies.min(), frequencies.max(),
+              velocities.min(), velocities.max()]
     
-    im = ax.imshow(dispersion_image, aspect=aspect, origin='lower',
+    # Notice transpose so that v is y, f is x
+    im = ax.imshow(dispersion_image.T, aspect=aspect, origin='lower',
                    extent=extent, cmap=cmap, interpolation='bilinear')
     
     # Add colorbar
     cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label('Normalized Energy', fontsize=11, fontweight='bold')
     
-    # Plot picked curve if provided
+    # Plot picked curve if provided (swap axes: f on x, v on y)
     if picked_curve is not None:
-        ax.plot(picked_curve, frequencies, 'w-', linewidth=3, 
+        ax.plot(frequencies, picked_curve, 'w-', linewidth=3, 
                 label='Fundamental Mode', alpha=0.9)
-        ax.plot(picked_curve, frequencies, 'k--', linewidth=1.5, alpha=0.7)
+        ax.plot(frequencies, picked_curve, 'k--', linewidth=1.5, alpha=0.7)
         ax.legend(loc='upper right', fontsize=10)
     
-    # Labels and formatting
-    ax.set_xlabel('Phase Velocity (m/s)', fontsize=12, fontweight='bold')
-    ax.set_ylabel('Frequency (Hz)', fontsize=12, fontweight='bold')
+    # Labels and formatting (swap x and y, i.e., x is frequency, y is velocity)
+    ax.set_xlabel('Frequency (Hz)', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Phase Velocity (m/s)', fontsize=12, fontweight='bold')
     ax.set_title(title, fontsize=14, fontweight='bold', pad=15)
     ax.grid(True, alpha=0.3, linestyle='--', color='white')
     
