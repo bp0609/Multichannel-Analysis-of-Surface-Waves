@@ -294,7 +294,7 @@ def plot_shot_gather(stream, distances=None, save_path=None):
     ax.grid(True, alpha=0.3)
     ax.set_xlim(0, time[-1])
     
-    plt.tight_layout()
+    # plt.tight_layout()
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -361,7 +361,7 @@ def plot_individual_traces(stream, n_traces=6, save_path=None):
     fig.suptitle('Individual Seismogram Traces\nDetailed Waveform View', 
                  fontsize=14, fontweight='bold', y=0.995)
     
-    plt.tight_layout()
+    # plt.tight_layout()
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -437,7 +437,7 @@ def plot_frequency_content(stream, save_path=None):
         ax.axvspan(5, 50, alpha=0.1, color='orange', label='Typical MASW band (5-50 Hz)')
     
     fig.suptitle('Frequency Content Analysis', fontsize=14, fontweight='bold', y=0.995)
-    plt.tight_layout()
+    # plt.tight_layout()
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -486,7 +486,7 @@ def plot_comprehensive_frequency_analysis(stream, distances=None, save_path=None
         distances = []
         for tr in stream:
             if hasattr(tr.stats.sac, 'dist'):
-                distances.append(tr.stats.sac.dist)
+                distances.append(tr.stats.sac.dist * DISTANCE_CORRECTION_FACTOR)
             else:
                 distances.append(0)
     
@@ -584,7 +584,7 @@ def plot_comprehensive_frequency_analysis(stream, distances=None, save_path=None
     fig.suptitle('Comprehensive Frequency Analysis', 
                  fontsize=16, fontweight='bold', y=0.995)
     
-    plt.tight_layout()
+    # plt.tight_layout()
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
@@ -692,7 +692,7 @@ def plot_acquisition_geometry(stream, save_path=None):
             fontsize=9, verticalalignment='top',
             bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
     
-    plt.tight_layout()
+    # plt.tight_layout()
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
