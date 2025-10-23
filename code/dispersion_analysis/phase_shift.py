@@ -197,19 +197,27 @@ def automatic_picking(dispersion_image, frequencies, velocities,
         max_idx = np.argmax(energy)
         picked_velocities[i] = velocities[max_idx]
         
-        # Estimate uncertainty from peak width
-        # Find half-maximum points
-        half_max = energy[max_idx] * 0.5
-        above_half = energy > half_max
+        # Estimate uncertainty from peak width at 80% of maximum
+        # Using 80% instead of 50% gives more realistic uncertainty for sharp peaks
+        # This is more appropriate for dispersion curves with good SNR
+        threshold = energy[max_idx] * 0.8
+        above_threshold = energy > threshold
         
-        if np.sum(above_half) > 1:
-            # Width at half maximum
-            indices = np.where(above_half)[0]
+        if np.sum(above_threshold) > 1:
+            # Width at 80% maximum
+            indices = np.where(above_threshold)[0]
             width = velocities[indices[-1]] - velocities[indices[0]]
-            uncertainties[i] = width / 2.355  # Convert FWHM to std dev
+            # Use a fraction of the width as uncertainty (more conservative than just width/2)
+            uncertainties[i] = width / 3.0
         else:
-            # Use velocity resolution
-            uncertainties[i] = (velocities[1] - velocities[0]) * 2
+            # Use velocity resolution as minimum uncertainty
+            vel_resolution = velocities[1] - velocities[0]
+            uncertainties[i] = vel_resolution * 2
+        
+        # Cap maximum uncertainty at 10% of picked velocity or 50 m/s, whichever is smaller
+        # This prevents unrealistically large uncertainties
+        max_uncertainty = min(picked_velocities[i] * 0.1, 50.0)
+        uncertainties[i] = min(uncertainties[i], max_uncertainty)
     
     # Smooth the picked curve
     if smooth_window > 1:

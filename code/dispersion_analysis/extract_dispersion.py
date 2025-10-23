@@ -87,14 +87,16 @@ print(f"Receiver spacing: {np.median(np.diff(distances)):.2f} m")
 # ============================================
 
 # Frequency range for analysis (Hz)
-freq_min = 1.0
+# Note: Below 5 Hz, the data quality is often poor (low SNR)
+freq_min = 5.0
 freq_max = 50.0
-n_freqs = 500
+n_freqs = 450
 frequencies = np.linspace(freq_min, freq_max, n_freqs)
 
 # Velocity range for analysis (m/s)
-vel_min = 1
-vel_max = 500.0
+# Extended range to avoid hitting upper bound
+vel_min = 100.0
+vel_max = 800.0
 n_vels = 500
 velocities = np.linspace(vel_min, vel_max, n_vels)
 
@@ -161,91 +163,7 @@ np.savetxt(dispersion_file, dispersion_data, header=header, fmt='%.4f')
 print(f"\nDispersion curve saved to: {dispersion_file}")
 
 # ============================================
-# 6. PLOT DISPERSION CURVE IN DIFFERENT FORMATS
-# ============================================
-
-def plot_dispersion_curve_formats(frequencies, velocities, uncertainties,
-                                   save_path=None):
-    """
-    Plot dispersion curve in multiple formats
-    """
-    
-    # Calculate wavelength
-    wavelengths = velocities / frequencies
-    
-    # Calculate period
-    periods = 1.0 / frequencies
-    
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    
-    # Plot 1: Velocity vs Frequency
-    ax = axes[0, 0]
-    ax.errorbar(frequencies, velocities, yerr=uncertainties,
-                fmt='o-', color='blue', capsize=3, capthick=1,
-                markersize=4, linewidth=1.5, label='Fundamental Mode')
-    ax.set_xlabel('Frequency (Hz)', fontweight='bold')
-    ax.set_ylabel('Phase Velocity (m/s)', fontweight='bold')
-    ax.set_title('Dispersion Curve: Velocity vs Frequency', fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend()
-    
-    # Plot 2: Velocity vs Wavelength
-    ax = axes[0, 1]
-    ax.errorbar(wavelengths, velocities, yerr=uncertainties,
-                fmt='o-', color='green', capsize=3, capthick=1,
-                markersize=4, linewidth=1.5)
-    ax.set_xlabel('Wavelength (m)', fontweight='bold')
-    ax.set_ylabel('Phase Velocity (m/s)', fontweight='bold')
-    ax.set_title('Dispersion Curve: Velocity vs Wavelength', fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    
-    # Plot 3: Velocity vs Period
-    ax = axes[1, 0]
-    ax.errorbar(periods, velocities, yerr=uncertainties,
-                fmt='o-', color='red', capsize=3, capthick=1,
-                markersize=4, linewidth=1.5)
-    ax.set_xlabel('Period (s)', fontweight='bold')
-    ax.set_ylabel('Phase Velocity (m/s)', fontweight='bold')
-    ax.set_title('Dispersion Curve: Velocity vs Period', fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    
-    # Plot 4: Slowness vs Frequency
-    ax = axes[1, 1]
-    slowness = 1000.0 / velocities  # Convert to s/km
-    slowness_unc = 1000.0 * uncertainties / velocities**2
-    ax.errorbar(frequencies, slowness, yerr=slowness_unc,
-                fmt='o-', color='purple', capsize=3, capthick=1,
-                markersize=4, linewidth=1.5)
-    ax.set_xlabel('Frequency (Hz)', fontweight='bold')
-    ax.set_ylabel('Slowness (s/km)', fontweight='bold')
-    ax.set_title('Dispersion Curve: Slowness vs Frequency', fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    
-    fig.suptitle('Dispersion Curve - Multiple Representations', 
-                 fontsize=14, fontweight='bold', y=0.995)
-    plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"Figure saved: {save_path}")
-    
-    plt.show()
-    
-    return fig
-
-print("\n" + "=" * 60)
-print("PLOTTING DISPERSION CURVE IN MULTIPLE FORMATS")
-print("=" * 60)
-
-fig_formats = plot_dispersion_curve_formats(
-    frequencies,
-    picked_velocities,
-    uncertainties,
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_curve_formats.png')
-)
-
-# ============================================
-# 7. QUALITY ASSESSMENT
+# 6. QUALITY ASSESSMENT
 # ============================================
 
 def assess_dispersion_quality(frequencies, velocities, uncertainties,
@@ -316,7 +234,7 @@ assess_dispersion_quality(frequencies, picked_velocities,
                          uncertainties, dispersion_image)
 
 # ============================================
-# 8. OPTIONAL: INTERACTIVE PICKING
+# 7. OPTIONAL: INTERACTIVE PICKING
 # ============================================
 
 print("\n" + "=" * 60)
@@ -336,7 +254,7 @@ if run_interactive:
     )
 
 # ============================================
-# 9. SAVE ANALYSIS SUMMARY
+# 8. SAVE ANALYSIS SUMMARY
 # ============================================
 
 summary = f"""

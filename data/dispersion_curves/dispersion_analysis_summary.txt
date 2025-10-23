@@ -9,19 +9,19 @@ Input Data:
   - Distance range: 10.0 - 69.0 m
 
 Analysis Parameters:
-  - Frequency range: 1.0 - 50.0 Hz
-  - Velocity range: 1 - 500.0 m/s
-  - Number of frequency points: 500
+  - Frequency range: 5.0 - 50.0 Hz
+  - Velocity range: 100.0 - 800.0 m/s
+  - Number of frequency points: 450
   - Number of velocity points: 500
 
 Method Applied:
   - Phase Shift (Geophydog f-c transform) ✓
 
 Dispersion Curve Results:
-  - Velocity range: 174.2 - 500.0 m/s
-  - Mean uncertainty: 110.3 m/s
-  - Wavelength range: 4.8 - 308.5 m
-  - Estimated max depth: 308.5 m
+  - Velocity range: 174.1 - 664.8 m/s
+  - Mean uncertainty: 16.5 m/s
+  - Wavelength range: 4.8 - 119.9 m
+  - Estimated max depth: 119.9 m
 
 Output Files:
   - Dispersion curve: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/dispersion_curve_fundamental.txt
@@ -29,4 +29,4 @@ Output Files:
 
 Quality: Ready for inversion ✓
 
-Date: 2025-10-23T16:46:29
+Date: 2025-10-23T16:59:13
