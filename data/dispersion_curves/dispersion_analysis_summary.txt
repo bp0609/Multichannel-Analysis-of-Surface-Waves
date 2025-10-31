@@ -24,9 +24,9 @@ Dispersion Curve Results:
   - Estimated max depth: 119.9 m
 
 Output Files:
-  - Dispersion curve: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/dispersion_curve_fundamental.txt
-  - Figures: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/results/figures/dispersion_*.png
+  - Dispersion curve: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/dispersion_curve_fundamental.txt
+  - Figures: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/results/figures/dispersion_*.png
 
 Quality: Ready for inversion ✓
 
-Date: 2025-10-23T16:59:13
+Date: 2025-10-31T09:06:01

@@ -4,7 +4,7 @@ MASW SITE CHARACTERIZATION REPORT
 ======================================================================
 
 Project: MASW Vs30 Analysis
-Date: 2025-10-19T18:29:52
+Date: 2025-10-31T12:14:50
 
 ======================================================================
 1. SHEAR WAVE VELOCITY PROFILE
@@ -14,30 +14,30 @@ Layer Parameters:
 ----------------------------------------------------------------------
 Layer    Thickness(m)    Vs(m/s)      Vp(m/s)      Rho(g/cm³)  
 ----------------------------------------------------------------------
-1        22.72           109.1        188.8        0.20        
-2        39.24           131.7        227.9        0.21        
-3        5.39            207.8        359.4        0.24        
-4        18.83           641.5        1109.8       0.32        
-5        20.73           670.8        1160.5       0.32        
-6        ∞ (half-space)  1144.0       1979.1       0.37        
+1        25.43           287.3        497.1        0.26        
+2        3.87            564.1        975.8        0.31        
+3        4.57            768.5        1329.5       0.33        
+4        25.44           1053.6       1822.7       0.36        
+5        32.19           1055.7       1826.3       0.36        
+6        ∞ (half-space)  1145.3       1981.3       0.37        
 
 ======================================================================
 2. Vs30 CALCULATION
 ======================================================================
 
-Vs30 = 30m / Σ(hi/Vsi) = 113.8 m/s
+Vs30 = 30m / Σ(hi/Vsi) = 311.6 m/s
 
 Time-Averaged Velocities:
-  Vs10 = 109.1 m/s
-  Vs15 = 109.1 m/s
-  Vs20 = 109.1 m/s
-  Vs30 = 113.8 m/s
+  Vs10 = 287.3 m/s
+  Vs15 = 287.3 m/s
+  Vs20 = 287.3 m/s
+  Vs30 = 311.6 m/s
 
 Vs30 Uncertainty (from 100 models):
-  Mean = 113.7 m/s
-  Std Dev = 7.8 m/s
-  95% CI = [98.4, 129.0] m/s
-  CoV = 6.8%
+  Mean = 322.9 m/s
+  Std Dev = 44.6 m/s
+  95% CI = [235.4, 410.4] m/s
+  CoV = 13.8%
 
 ======================================================================
 3. SITE CLASSIFICATION
@@ -45,22 +45,22 @@ Vs30 Uncertainty (from 100 models):
 
 NEHRP (ASCE 7-22) Site Classification:
 ----------------------------------------------------------------------
-  Site Class: E
-  Description: Soft Soil
+  Site Class: D
+  Description: Stiff Soil
   
   Site Coefficients (for design spectrum):
-    Fa (short period) = 2.50
-    Fv (long period) = 3.50
+    Fa (short period) = 1.60
+    Fv (long period) = 2.40
 
 NEHRP Extended Classification (9 classes):
 ----------------------------------------------------------------------
-  Site Class: E
-  Description: Soft Soil
+  Site Class: D
+  Description: Stiff Soil
 
 Eurocode 8 Classification:
 ----------------------------------------------------------------------
-  Ground Type: D
-  Description: Loose to medium sand, gravel, or soft clay
+  Ground Type: C
+  Description: Dense sand, gravel, or stiff clay
 
 ======================================================================
 4. ENGINEERING INTERPRETATION
@@ -68,29 +68,28 @@ Eurocode 8 Classification:
 
 Site Characteristics:
 
-  Site Type: SOFT SOIL
+  Site Type: STIFF SOIL
   
   Engineering Considerations:
-  - High amplification of seismic ground motions expected
-  - Potential for significant site effects
-  - May require site-specific seismic hazard analysis
-  - Consider ground improvement for critical structures
-  - Higher liquefaction susceptibility if saturated cohesionless soils present
-  - Foundation design should account for potential large settlements
+  - Moderate amplification of seismic ground motions
+  - Standard seismic design provisions typically adequate
+  - Evaluate liquefaction potential in saturated zones
+  - Conventional foundation systems usually suitable
+  - Site-specific analysis recommended for critical facilities
 
 ======================================================================
 5. QUALITY METRICS
 ======================================================================
 
 Depth of Investigation:
-  Maximum wavelength: 22.8 m (at 5 Hz)
-  Estimated max depth: 22.8 m
-  Coverage for Vs30: LIMITED (<30m)
+  Maximum wavelength: 62.3 m (at 5 Hz)
+  Estimated max depth: 62.3 m
+  Coverage for Vs30: ADEQUATE (≥30m)
 
 Velocity Range:
-  Surface Vs: 109.1 m/s
-  Minimum Vs: 109.1 m/s
-  Maximum Vs: 1144.0 m/s
+  Surface Vs: 287.3 m/s
+  Minimum Vs: 287.3 m/s
+  Maximum Vs: 1145.3 m/s
 
 ======================================================================
 6. REFERENCES

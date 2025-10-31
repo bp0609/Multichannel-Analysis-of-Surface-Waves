@@ -17,7 +17,7 @@ Processing Steps Applied:
   3. Spectral Whitening: Not applied
 
 Output:
-  - Processed traces saved to: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/processed
+  - Processed traces saved to: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/data/processed
   - Number of output files: 60
   
 Quality Notes:
@@ -25,4 +25,4 @@ Quality Notes:
   - No NaN or Inf values in output
   - Ready for dispersion analysis
 
-Date: 2025-10-19 22:53:16
+Date: 2025-10-31 14:33:26
