@@ -15,20 +15,31 @@ Inversion Results:
     - Vs30: 309.4 m/s
   
   Monte Carlo:
+<<<<<<< HEAD
     - Best RMS error: 37.64 m/s
     - Vs30: 350.0 m/s
+=======
+    - Best RMS error: 37.46 m/s
+    - Vs30: 343.2 m/s
+>>>>>>> 3dd5bdfd5b46ea07bfbe7b83b2ac64abecf873b0
     - Models tested: 1000
     - Acceptable models: 100
   
   Hybrid (FINAL):
+<<<<<<< HEAD
     - RMS error: 76.97 m/s
     - Vs30: 287.5 m/s
+=======
+    - RMS error: 73.16 m/s
+    - Vs30: 311.6 m/s
+>>>>>>> 3dd5bdfd5b46ea07bfbe7b83b2ac64abecf873b0
 
 Final Model:
 Layered Earth Model:
 ------------------------------------------------------------
 Layer    Thickness(m)    Vs(m/s)      Vp(m/s)      Rho(g/cm³)  
 ------------------------------------------------------------
+<<<<<<< HEAD
 1        31.04           287.5        497.5        0.26        
 2        11.57           459.4        794.7        0.29        
 3        18.01           496.4        858.7        0.30        
@@ -37,10 +48,24 @@ Layer    Thickness(m)    Vs(m/s)      Vp(m/s)      Rho(g/cm³)
 6        ∞ (half-space)  1338.7       2316.0       0.38        
 ------------------------------------------------------------
 Vs30 = 287.5 m/s
+=======
+1        25.43           287.3        497.1        0.26        
+2        3.87            564.1        975.8        0.31        
+3        4.57            768.5        1329.5       0.33        
+4        25.44           1053.6       1822.7       0.36        
+5        32.19           1055.7       1826.3       0.36        
+6        ∞ (half-space)  1145.3       1981.3       0.37        
+------------------------------------------------------------
+Vs30 = 311.6 m/s
+>>>>>>> 3dd5bdfd5b46ea07bfbe7b83b2ac64abecf873b0
 
 
 Output Files:
-  - Model: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/vs_profile_final.txt
-  - Figures: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/results/figures/inversion/
+  - Model: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/vs_profile_final.txt
+  - Figures: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/results/figures/inversion/
 
+<<<<<<< HEAD
 Date: 2025-10-31T12:31:11
+=======
+Date: 2025-10-31T09:07:09
+>>>>>>> 3dd5bdfd5b46ea07bfbe7b83b2ac64abecf873b0

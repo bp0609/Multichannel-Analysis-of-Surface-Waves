@@ -1,0 +1,108 @@
+
+======================================================================
+MASW SITE CHARACTERIZATION REPORT
+======================================================================
+
+Project: MASW Vs30 Analysis
+Date: 2025-10-31T12:14:50
+
+======================================================================
+1. SHEAR WAVE VELOCITY PROFILE
+======================================================================
+
+Layer Parameters:
+----------------------------------------------------------------------
+Layer    Thickness(m)    Vs(m/s)      Vp(m/s)      Rho(g/cm³)  
+----------------------------------------------------------------------
+1        25.43           287.3        497.1        0.26        
+2        3.87            564.1        975.8        0.31        
+3        4.57            768.5        1329.5       0.33        
+4        25.44           1053.6       1822.7       0.36        
+5        32.19           1055.7       1826.3       0.36        
+6        ∞ (half-space)  1145.3       1981.3       0.37        
+
+======================================================================
+2. Vs30 CALCULATION
+======================================================================
+
+Vs30 = 30m / Σ(hi/Vsi) = 311.6 m/s
+
+Time-Averaged Velocities:
+  Vs10 = 287.3 m/s
+  Vs15 = 287.3 m/s
+  Vs20 = 287.3 m/s
+  Vs30 = 311.6 m/s
+
+Vs30 Uncertainty (from 100 models):
+  Mean = 322.9 m/s
+  Std Dev = 44.6 m/s
+  95% CI = [235.4, 410.4] m/s
+  CoV = 13.8%
+
+======================================================================
+3. SITE CLASSIFICATION
+======================================================================
+
+NEHRP (ASCE 7-22) Site Classification:
+----------------------------------------------------------------------
+  Site Class: D
+  Description: Stiff Soil
+  
+  Site Coefficients (for design spectrum):
+    Fa (short period) = 1.60
+    Fv (long period) = 2.40
+
+NEHRP Extended Classification (9 classes):
+----------------------------------------------------------------------
+  Site Class: D
+  Description: Stiff Soil
+
+Eurocode 8 Classification:
+----------------------------------------------------------------------
+  Ground Type: C
+  Description: Dense sand, gravel, or stiff clay
+
+======================================================================
+4. ENGINEERING INTERPRETATION
+======================================================================
+
+Site Characteristics:
+
+  Site Type: STIFF SOIL
+  
+  Engineering Considerations:
+  - Moderate amplification of seismic ground motions
+  - Standard seismic design provisions typically adequate
+  - Evaluate liquefaction potential in saturated zones
+  - Conventional foundation systems usually suitable
+  - Site-specific analysis recommended for critical facilities
+
+======================================================================
+5. QUALITY METRICS
+======================================================================
+
+Depth of Investigation:
+  Maximum wavelength: 62.3 m (at 5 Hz)
+  Estimated max depth: 62.3 m
+  Coverage for Vs30: ADEQUATE (≥30m)
+
+Velocity Range:
+  Surface Vs: 287.3 m/s
+  Minimum Vs: 287.3 m/s
+  Maximum Vs: 1145.3 m/s
+
+======================================================================
+6. REFERENCES
+======================================================================
+
+ASCE 7-22: Minimum Design Loads and Associated Criteria for Buildings 
+            and Other Structures
+
+NEHRP: Recommended Seismic Provisions for New Buildings and Other 
+       Structures (FEMA P-2082)
+
+Eurocode 8: Design of structures for earthquake resistance
+
+======================================================================
+END OF REPORT
+======================================================================
