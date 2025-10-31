@@ -99,25 +99,36 @@ Multichannel-Analysis-of-Surface-Waves/
 │
 ├── results/                           # Output products
 │   └── figures/                       # All generated figures
-│       ├── acquisition_geometry.png
-│       ├── shot_gather_raw.png
-│       ├── preprocessing_comparison.png
-│       ├── dispersion_phase_shift.png
-│       ├── dispersion_picked_auto.png
-│       ├── inversion/
-│       │   ├── observed_dispersion.png
+│       ├── dispersion/                # Dispersion analysis plots
+│       │   ├── dispersion_phase_shift.png
+│       │   └── dispersion_picked_auto.png
+│       │
+│       ├── inversion/                 # Inversion results
+│       │   ├── observed_dispersion.png     (IMPROVED: wider spacing)
 │       │   ├── initial_model.png
 │       │   ├── result_least_squares.png
 │       │   ├── result_monte_carlo.png
 │       │   ├── result_hybrid.png
 │       │   ├── comparison_all.png
 │       │   └── uncertainty_envelope.png
-│       └── vs30/
-│           ├── vs_profile_with_vs30.png
-│           ├── vs_statistics.png
-│           ├── nehrp_classification.png
-│           ├── vs30_uncertainty.png
-│           └── summary_report.png
+│       │
+│       ├── vs30/                      # Vs30 analysis plots
+│       │   ├── vs_profile_with_vs30.png    (IMPROVED: less congested)
+│       │   ├── vs_statistics.png
+│       │   ├── nehrp_classification.png
+│       │   ├── vs30_uncertainty.png
+│       │   └── summary_report.png
+│       │
+│       └── publication/               # Publication-quality figures
+│           ├── figure1_workflow_diagram.png
+│           ├── figure2_raw_seismic_data.png
+│           ├── figure3_dispersion_image.png
+│           ├── figure4_dispersion_comparison.png
+│           ├── figure5_vs_profile_interpretation.png
+│           ├── figure6_sensitivity_analysis.png
+│           ├── figure7_site_classification.png
+│           ├── figure8_conceptual_diagrams.png
+│           └── figure9_comprehensive_summary.png
 │
 ├── inspect_geophydog_data.py          # Data inspection utility
 ├── test_disba.py                      # disba library testing
@@ -244,9 +255,9 @@ n_vels = 500           # Velocity sampling points
 - **Estimated max depth**: ~120 m (λ_max / 2)
 
 **Outputs**:
-- `dispersion_curve_fundamental.txt`: Picked dispersion curve
-- `dispersion_phase_shift.png`: Dispersion image
-- `dispersion_picked_auto.png`: Picked curve overlay
+- `dispersion_curve_fundamental.txt`: Picked dispersion curve (450 points)
+- `dispersion/dispersion_phase_shift.png`: Dispersion image
+- `dispersion/dispersion_picked_auto.png`: Picked curve overlay
 - `dispersion_analysis_summary.txt`: Analysis report
 
 ---
@@ -267,11 +278,11 @@ n_vels = 500           # Velocity sampling points
 - Method: Random sampling with acceptance criteria
 - Models tested: 1000
 - Acceptable models: 100 (RMS < threshold)
-- Best result: RMS error = 37.46 m/s, Vs30 = 343.2 m/s
+- Best result: RMS error = 37.80 m/s, Vs30 = 286.7 m/s
 
 #### 3. **Hybrid Approach (FINAL)**
 - Combine global search exploration with local optimization
-- Result: **RMS error = 73.16 m/s, Vs30 = 311.6 m/s**
+- Result: **RMS error = 77.62 m/s, Vs30 = 287.6 m/s**
 
 **Earth Model Parameterization**:
 - Number of layers: 6 (5 layers + half-space)
@@ -279,10 +290,11 @@ n_vels = 500           # Velocity sampling points
 - Constrained parameters: Vp (from Vs using empirical relations), density (ρ)
 
 **Outputs**:
-- `vs_profile_final.txt`: Final layered earth model
+- `vs_profile_final.txt`: Final layered earth model (6 layers)
+- `inversion/observed_dispersion.png`: Observed dispersion with uncertainty (IMPROVED)
 - `inversion/result_hybrid.png`: Best-fit model and dispersion
 - `inversion/comparison_all.png`: All three methods compared
-- `inversion/uncertainty_envelope.png`: Ensemble uncertainty
+- `inversion/uncertainty_envelope.png`: Ensemble uncertainty from 100 models
 - `inversion_summary.txt`: Inversion report
 
 ---
@@ -297,18 +309,18 @@ $$\text{Vs30} = \frac{30}{\sum_{i=1}^{n} \frac{h_i}{V_{si}}}$$
 where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$.
 
 **Statistical Analysis**:
-- Vs30 = **311.6 m/s** (final model)
-- Vs30 mean = 322.9 m/s (from 100 Monte Carlo models)
-- Vs30 std dev = 44.6 m/s
-- 95% Confidence Interval = [235.4, 410.4] m/s
-- Coefficient of Variation = 13.8%
+- Vs30 = **287.6 m/s** (final model)
+- Vs30 mean = 287.5 m/s (from 100 Monte Carlo models)
+- Vs30 std dev = 30.6 m/s
+- 95% Confidence Interval = [227.6, 347.5] m/s
+- Coefficient of Variation = 10.6%
 
 **Other Metrics**:
-- Vs10 = 287.3 m/s
-- Vs15 = 287.3 m/s
-- Vs20 = 287.3 m/s
-- Surface Vs = 287.3 m/s
-- Maximum Vs = 1145.3 m/s (half-space)
+- Vs10 = 287.6 m/s
+- Vs15 = 287.6 m/s
+- Vs20 = 287.6 m/s
+- Surface Vs = 287.6 m/s
+- Maximum Vs = 1309.8 m/s (half-space)
 
 **Site Classifications**:
 
@@ -323,12 +335,12 @@ where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$
 - Fv (long period amplification) = 2.40
 
 **Outputs**:
-- `vs30/vs_profile_with_vs30.png`: Vs profile with Vs30 overlay
-- `vs30/vs_statistics.png`: Multiple Vs metrics
-- `vs30/nehrp_classification.png`: Classification chart
-- `vs30/vs30_uncertainty.png`: Uncertainty analysis
-- `vs30/summary_report.png`: Comprehensive summary
-- `site_characterization_report.txt`: Full engineering report
+- `vs30/vs_profile_with_vs30.png`: Vs profile with Vs30 overlay (IMPROVED)
+- `vs30/vs_statistics.png`: Multiple Vs metrics (Vs10, Vs15, Vs20, Vs30)
+- `vs30/nehrp_classification.png`: NEHRP classification chart with site marker
+- `vs30/vs30_uncertainty.png`: Uncertainty distribution from 100 Monte Carlo models
+- `vs30/summary_report.png`: Comprehensive summary figure
+- `site_characterization_report.txt`: Full engineering report with site classification
 
 ---
 
@@ -338,16 +350,16 @@ where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$
 
 | Layer | Thickness (m) | Vs (m/s) | Vp (m/s) | Density (g/cm³) |
 |-------|---------------|----------|----------|-----------------|
-| 1 | 25.43 | 287.3 | 497.1 | 0.26 |
-| 2 | 3.87 | 564.1 | 975.8 | 0.31 |
-| 3 | 4.57 | 768.5 | 1329.5 | 0.33 |
-| 4 | 25.44 | 1053.6 | 1822.7 | 0.36 |
-| 5 | 32.19 | 1055.7 | 1826.3 | 0.36 |
-| 6 | ∞ (half-space) | 1145.3 | 1981.3 | 0.37 |
+| 1 | 37.33 | 287.6 | 497.5 | 0.26 |
+| 2 | 9.66 | 712.0 | 1231.7 | 0.33 |
+| 3 | 29.46 | 744.2 | 1287.4 | 0.33 |
+| 4 | 14.82 | 958.9 | 1658.9 | 0.35 |
+| 5 | 20.10 | 1059.6 | 1833.2 | 0.36 |
+| 6 | ∞ (half-space) | 1309.8 | 2266.0 | 0.38 |
 
 ### Key Findings
 
-✅ **Vs30 = 311.6 m/s** → **NEHRP Site Class D (Stiff Soil)**
+✅ **Vs30 = 287.6 m/s** → **NEHRP Site Class D (Stiff Soil)**
 
 ✅ **Engineering Implications**:
 - Moderate amplification of seismic ground motions expected
@@ -357,10 +369,11 @@ where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$
 - Site-specific response analysis recommended for critical facilities
 
 ✅ **Quality Metrics**:
-- Maximum investigation depth: ~120 m
+- Maximum investigation depth: ~120 m (from dispersion wavelength analysis)
 - Coverage for Vs30 calculation: **ADEQUATE** (well exceeds 30 m requirement)
-- Inversion RMS error: 73.16 m/s (~11% relative error)
+- Inversion RMS error: 77.62 m/s (~12% relative error)
 - Uncertainty analysis: 100 Monte Carlo models evaluated
+- Vs30 uncertainty: ±30.6 m/s (1σ), CoV = 10.6%
 
 ---
 
@@ -411,33 +424,38 @@ python code/vs30/run_vs30_analysis.py
 
 All figures are saved in `results/figures/` with publication-quality resolution (300 DPI):
 
-**Data Exploration**:
-- `shot_gather_raw.png`
-- `acquisition_geometry.png`
-- `frequency_content.png`
+**Dispersion Analysis** (`dispersion/` subdirectory):
+- `dispersion_phase_shift.png` - Dispersion image from phase shift transform
+- `dispersion_picked_auto.png` - Automatically picked fundamental mode curve
 
-**Preprocessing**:
-- `preprocessing_comparison.png`
+**Inversion Results** (`inversion/` subdirectory):
+- `observed_dispersion.png` - **Observed dispersion curve with uncertainty band** (IMPROVED: 14×7 figure, filled uncertainty region, cleaner spacing)
+- `initial_model.png` - Initial model and theoretical dispersion
+- `result_least_squares.png` - Least-squares inversion result
+- `result_monte_carlo.png` - Monte Carlo global search result
+- `result_hybrid.png` - Hybrid inversion result (FINAL)
+- `comparison_all.png` - Comparison of all three inversion methods
+- `uncertainty_envelope.png` - Uncertainty envelope from 100 Monte Carlo models
 
-**Dispersion Analysis**:
-- `dispersion_phase_shift.png`
-- `dispersion_picked_auto.png`
+**Vs30 Analysis** (`vs30/` subdirectory):
+- `vs_profile_with_vs30.png` - **Shear-wave velocity profile with Vs30** (IMPROVED: 14×9 figure, better layer annotation positioning, less congested)
+- `vs_statistics.png` - Comparison of Vs10, Vs15, Vs20, Vs30
+- `nehrp_classification.png` - NEHRP site classification chart
+- `vs30_uncertainty.png` - Vs30 probability distribution from ensemble
+- `summary_report.png` - Comprehensive summary figure
 
-**Inversion** (in `inversion/` subdirectory):
-- `observed_dispersion.png`
-- `initial_model.png`
-- `result_least_squares.png`
-- `result_monte_carlo.png`
-- `result_hybrid.png`
-- `comparison_all.png`
-- `uncertainty_envelope.png`
+**Publication-Quality Figures** (`publication/` subdirectory):
+- `figure1_workflow_diagram.png` - Complete MASW workflow
+- `figure2_raw_seismic_data.png` - Raw seismic shot gather
+- `figure3_dispersion_image.png` - Dispersion image with picked curves
+- `figure4_dispersion_comparison.png` - Observed vs modeled dispersion
+- `figure5_vs_profile_interpretation.png` - Vs profile with layer interpretation
+- `figure6_sensitivity_analysis.png` - Model sensitivity to parameters
+- `figure7_site_classification.png` - Site classification and implications
+- `figure8_conceptual_diagrams.png` - Conceptual framework and principles
+- `figure9_comprehensive_summary.png` - Complete analysis summary
 
-**Vs30 Analysis** (in `vs30/` subdirectory):
-- `vs_profile_with_vs30.png`
-- `vs_statistics.png`
-- `nehrp_classification.png`
-- `vs30_uncertainty.png`
-- `summary_report.png`
+> **Note**: Figures marked as "IMPROVED" have enhanced visualization with better spacing, cleaner layouts, and reduced visual congestion based on the latest updates.
 
 ---
 

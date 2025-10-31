@@ -25,7 +25,8 @@ def plot_vs_profile_with_vs30(model, save_path=None):
         Path to save figure
     """
     
-    fig, ax = plt.subplots(figsize=(10, 8))
+    # Wider figure for better horizontal spacing
+    fig, ax = plt.subplots(figsize=(14, 9))
     
     # Get profile
     depths, vs_profile = model.get_depth_array(dz=0.5)
@@ -37,53 +38,86 @@ def plot_vs_profile_with_vs30(model, save_path=None):
     mask_30m = depths <= 30
     avg_vs_30m = np.mean(vs_profile[mask_30m])
     
-    # Plot Vs profile
-    ax.plot(vs_profile, depths, 'b-', linewidth=3, label='Vs Profile')
+    # Plot Vs profile with thicker line
+    ax.plot(vs_profile, depths, 'b-', linewidth=3.5, label='Vs Profile', zorder=5)
     
-    # Mark layer boundaries
+    # Mark layer boundaries with alternating annotation positions
     cumulative_depth = 0
+    max_vs = max(model.vs)
+    
     for i in range(model.n_layers - 1):
         cumulative_depth += model.thickness[i]
+        
+        # Draw layer boundary line
         ax.axhline(cumulative_depth, color='gray', linestyle='--', 
-                   alpha=0.5, linewidth=1)
-        ax.text(model.vs[i], cumulative_depth - 1, 
-                f'  Layer {i+1}: {model.vs[i]:.0f} m/s', 
-                fontsize=9, verticalalignment='top')
+                   alpha=0.5, linewidth=1.5, zorder=2)
+        
+        # Alternate annotation positions to avoid overlap
+        # Place annotations on the right side with enough spacing
+        x_pos = max_vs * 0.85
+        
+        # Add layer info with better positioning
+        layer_text = f'Layer {i+1}: {model.vs[i]:.0f} m/s'
+        ax.text(x_pos, cumulative_depth + 2, layer_text, 
+                fontsize=9, verticalalignment='bottom',
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', 
+                         edgecolor='gray', alpha=0.8))
+    
+    # Add the last layer info (half-space)
+    last_layer_depth = min(cumulative_depth + 5, depths[-1] - 5)
+    ax.text(max_vs * 0.85, last_layer_depth, 
+            f'Layer {model.n_layers}: {model.vs[-1]:.0f} m/s', 
+            fontsize=9, verticalalignment='center',
+            bbox=dict(boxstyle='round,pad=0.3', facecolor='white', 
+                     edgecolor='gray', alpha=0.8))
     
     # Highlight 30m depth
-    ax.axhline(30, color='red', linestyle='-', linewidth=2.5, 
-               label='30m Depth', alpha=0.7, zorder=10)
+    ax.axhline(30, color='red', linestyle='-', linewidth=3, 
+               label='30m Depth', alpha=0.8, zorder=10)
     
     # Draw Vs30 line
-    ax.axvline(vs30, color='green', linestyle='--', linewidth=2.5,
+    ax.axvline(vs30, color='green', linestyle='--', linewidth=3,
                label=f'Vs30 = {vs30:.1f} m/s', alpha=0.8, zorder=9)
     
     # Shade the top 30m region
-    ax.axhspan(0, 30, alpha=0.1, color='yellow', zorder=1)
+    ax.axhspan(0, 30, alpha=0.15, color='yellow', zorder=1)
     
-    # Add text annotations
-    ax.text(0.02, 0.98, f'Vs30 = {vs30:.1f} m/s\nArithmetic Mean = {avg_vs_30m:.1f} m/s',
-            transform=ax.transAxes, fontsize=11, verticalalignment='top',
-            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    # Add text annotations with better positioning
+    info_text = f'Vs30 = {vs30:.1f} m/s\nArithmetic Mean = {avg_vs_30m:.1f} m/s'
+    ax.text(0.02, 0.98, info_text,
+            transform=ax.transAxes, fontsize=12, verticalalignment='top',
+            bbox=dict(boxstyle='round,pad=0.5', facecolor='wheat', 
+                     edgecolor='black', alpha=0.85, linewidth=1.5))
     
     # Get site classification
     classifications = classify_site_all_systems(vs30)
     nehrp = classifications['nehrp']
     
-    ax.text(0.02, 0.75, 
-            f"NEHRP Site Class: {nehrp['class']}\n{nehrp['description']}",
-            transform=ax.transAxes, fontsize=11, verticalalignment='top',
-            bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+    nehrp_text = f"NEHRP Site Class: {nehrp['class']}\n{nehrp['description']}"
+    ax.text(0.02, 0.75, nehrp_text,
+            transform=ax.transAxes, fontsize=12, verticalalignment='top',
+            bbox=dict(boxstyle='round,pad=0.5', facecolor='lightblue', 
+                     edgecolor='black', alpha=0.85, linewidth=1.5))
     
-    ax.set_xlabel('Vs (m/s)', fontsize=13, fontweight='bold')
-    ax.set_ylabel('Depth (m)', fontsize=13, fontweight='bold')
+    # Formatting
+    ax.set_xlabel('Vs (m/s)', fontsize=14, fontweight='bold')
+    ax.set_ylabel('Depth (m)', fontsize=14, fontweight='bold')
     ax.set_title('Shear Wave Velocity Profile with Vs30', 
-                 fontsize=14, fontweight='bold', pad=15)
+                 fontsize=16, fontweight='bold', pad=20)
     ax.invert_yaxis()
-    ax.grid(True, alpha=0.3)
-    ax.legend(loc='lower right', fontsize=11)
-    ax.set_ylim(50, 0)
-    ax.set_xlim(0, max(model.vs) * 1.1)
+    
+    # Enhanced grid
+    ax.grid(True, alpha=0.4, linestyle='-', linewidth=0.8, zorder=0)
+    ax.minorticks_on()
+    ax.grid(True, which='minor', alpha=0.2, linestyle=':', zorder=0)
+    
+    # Better legend
+    ax.legend(loc='lower right', fontsize=12, framealpha=0.9, 
+             edgecolor='black', fancybox=True)
+    
+    # Set axis limits with more spacing
+    ax.set_ylim(depths[-1], 0)
+    ax.set_xlim(0, max_vs * 1.15)
     
     plt.tight_layout()
     

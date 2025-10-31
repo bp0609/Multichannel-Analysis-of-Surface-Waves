@@ -123,7 +123,7 @@ fig_ps = plot_dispersion_image(
     frequencies,
     velocities,
     title="Dispersion Image - Phase Shift Method",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_phase_shift.png')
+    save_path=os.path.join(FIGURES_DIR, 'dispersion', 'dispersion_phase_shift.png')
 )
 
 # ============================================
@@ -149,7 +149,7 @@ fig_picked = plot_dispersion_image(
     velocities,
     picked_curve=picked_velocities,
     title="Dispersion Image with Automatically Picked Curve",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_picked_auto.png')
+    save_path=os.path.join(FIGURES_DIR, 'dispersion', 'dispersion_picked_auto.png')
 )
 
 # Save picked curve
