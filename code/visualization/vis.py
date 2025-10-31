@@ -1,5 +1,5 @@
 """
-MASW Project - Phase 7: Visualization & Diagrams
+MASW Project - Visualization & Diagrams
 Complete figure generation for publication-ready results
 """
 
@@ -8,6 +8,11 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.gridspec import GridSpec
 import os
+import sys
+
+# Add project paths
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import FIGURES_DIR
 
 # Set publication-quality style
 plt.style.use('seaborn-v0_8-darkgrid')
@@ -23,12 +28,11 @@ plt.rcParams['legend.fontsize'] = 9
 plt.rcParams['figure.titlesize'] = 14
 
 # Create figure directories
-FIGURES_DIR = '../../results/figures'
-PHASE7_DIR = os.path.join(FIGURES_DIR, 'phase7_complete')
-os.makedirs(PHASE7_DIR, exist_ok=True)
+PUBLICATION_DIR = os.path.join(FIGURES_DIR, 'publication')
+os.makedirs(PUBLICATION_DIR, exist_ok=True)
 
 print("="*70)
-print("PHASE 7: VISUALIZATION & DIAGRAMS")
+print("MASW VISUALIZATION & PUBLICATION FIGURES")
 print("="*70)
 print("\nGenerating complete figure set for MASW analysis...")
 print()
@@ -89,7 +93,7 @@ ax.set_title('MASW Analysis Workflow: From Field Data to Site Classification',
             fontsize=16, fontweight='bold', pad=20)
 
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure1_workflow_diagram.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure1_workflow_diagram.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure1_workflow_diagram.png")
 plt.close()
@@ -147,7 +151,7 @@ plt.colorbar(im, ax=ax2, label='Amplitude')
 plt.suptitle('Figure 2: Raw Seismic Data Showing Surface Wave Arrivals', 
             fontsize=14, fontweight='bold', y=1.00)
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure2_raw_seismic_data.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure2_raw_seismic_data.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure2_raw_seismic_data.png")
 plt.close()
@@ -198,7 +202,7 @@ ax.legend(loc='lower right', fontsize=11)
 ax.grid(True, alpha=0.3, color='white', linewidth=0.5)
 
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure3_dispersion_image.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure3_dispersion_image.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure3_dispersion_image.png")
 plt.close()
@@ -253,7 +257,7 @@ ax2.text(0.02, 0.98, stats_text, transform=ax2.transAxes,
 plt.suptitle('Figure 4: Dispersion Curve Inversion Quality', 
             fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure4_dispersion_comparison.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure4_dispersion_comparison.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure4_dispersion_comparison.png")
 plt.close()
@@ -338,7 +342,7 @@ for i in range(len(depths)-1):
 plt.suptitle('Figure 5: Shear-Wave Velocity Profile with Geological Interpretation', 
             fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure5_vs_profile_interpretation.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure5_vs_profile_interpretation.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure5_vs_profile_interpretation.png")
 plt.close()
@@ -432,7 +436,7 @@ ax4.text(0.1, 0.95, sensitivity_text, transform=ax4.transAxes,
 plt.suptitle('Figure 6: Dispersion Curve Sensitivity to Model Parameters', 
             fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure6_sensitivity_analysis.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure6_sensitivity_analysis.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure6_sensitivity_analysis.png")
 plt.close()
@@ -565,7 +569,7 @@ ax3.text(0.05, 0.95, implications_text, transform=ax3.transAxes,
 plt.suptitle('Figure 7: Site Classification and Engineering Implications', 
             fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure7_site_classification.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure7_site_classification.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure7_site_classification.png")
 plt.close()
@@ -736,7 +740,7 @@ ax4.text(0.05, 0.95, relationship_text, transform=ax4.transAxes,
 plt.suptitle('Figure 8: Conceptual Framework and Physical Principles', 
             fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig(os.path.join(PHASE7_DIR, 'figure8_conceptual_diagrams.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure8_conceptual_diagrams.png'), 
            bbox_inches='tight', facecolor='white')
 print(f"   ✓ Saved: figure8_conceptual_diagrams.png")
 plt.close()
@@ -885,7 +889,7 @@ ax6.text(0.1, 0.9, stats_text, transform=ax6.transAxes,
 
 plt.suptitle('Figure 9: MASW Analysis Summary - Complete Site Characterization', 
             fontsize=16, fontweight='bold')
-plt.savefig(os.path.join(PHASE7_DIR, 'figure9_comprehensive_summary.png'), 
+plt.savefig(os.path.join(PUBLICATION_DIR, 'figure9_comprehensive_summary.png'), 
            bbox_inches='tight', facecolor='white', dpi=300)
 print(f"   ✓ Saved: figure9_comprehensive_summary.png")
 plt.close()
@@ -894,9 +898,9 @@ plt.close()
 # SUMMARY AND INDEX
 # =============================================================================
 print("\n" + "="*70)
-print("PHASE 7 COMPLETE: ALL VISUALIZATIONS GENERATED")
+print("VISUALIZATION COMPLETE: ALL PUBLICATION FIGURES GENERATED")
 print("="*70)
-print(f"\nAll figures saved to: {PHASE7_DIR}/")
+print(f"\nAll figures saved to: {PUBLICATION_DIR}/")
 print("\nGenerated Figures:")
 print("  [1] figure1_workflow_diagram.png")
 print("  [2] figure2_raw_seismic_data.png")
@@ -908,7 +912,7 @@ print("  [7] figure7_site_classification.png")
 print("  [8] figure8_conceptual_diagrams.png")
 print("  [9] figure9_comprehensive_summary.png")
 print("\n" + "="*70)
-print("READY FOR PHASE 8-11: DOCUMENTATION & REPORTING")
+print("READY FOR: DOCUMENTATION & REPORTING")
 print("="*70)
 print("\nNext Steps:")
 print("  • Compile these figures into final report")

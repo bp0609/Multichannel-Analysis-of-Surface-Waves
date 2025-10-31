@@ -1,8 +1,5 @@
-# notebooks/04_inversion.ipynb
-# Or: code/inversion/run_inversion.py
-
 """
-Phase 5: Inversion for Vs Profile
+Inversion for Vs Profile
 Invert dispersion curve to obtain shear-wave velocity profile
 """
 
@@ -459,6 +456,6 @@ print("\n" + summary)
 print(f"Summary saved to: {summary_file}")
 
 print("\n" + "=" * 60)
-print("PHASE 5 COMPLETE: Inversion for Vs Profile")
+print("INVERSION COMPLETE: Vs Profile Obtained")
 print("=" * 60)
-print("\nProceed to Phase 6: Vs30 Calculation and Site Classification")
+print("\nReady for: Vs30 Calculation and Site Classification")

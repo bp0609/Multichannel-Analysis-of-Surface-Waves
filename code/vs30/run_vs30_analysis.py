@@ -1,8 +1,5 @@
-# notebooks/05_vs30_analysis.ipynb
-# Or: code/vs30/run_vs30_analysis.py
-
 """
-Phase 6: Vs30 Calculation and Site Classification
+Vs30 Calculation and Site Classification
 Calculate Vs30, determine site class, and perform comprehensive analysis
 """
 
@@ -528,10 +525,10 @@ print(report)
 print(f"\nReport saved to: {report_file}")
 
 print("\n" + "=" * 60)
-print("PHASE 6 COMPLETE: Vs30 Calculation and Site Classification")
+print("Vs30 ANALYSIS COMPLETE: Calculation and Site Classification")
 print("=" * 60)
 print("\nGenerated files:")
 print(f"  - Site characterization report: {report_file}")
 print(f"  - Summary figures: {FIGURES_DIR}/vs30/")
-print("\nAll analysis phases complete!")
-print("Ready for Phase 7: Final Report Preparation")
+print("\nVs30 analysis complete!")
+print("Ready for: Visualization and Final Report Preparation")
