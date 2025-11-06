@@ -1,8 +1,5 @@
-# notebooks/03_dispersion_analysis.ipynb
-# Or: code/dispersion_analysis/extract_dispersion.py
-
 """
-Phase 4: Dispersion Analysis
+Dispersion Analysis
 Extract dispersion curves from preprocessed MASW data
 """
 
@@ -126,7 +123,7 @@ fig_ps = plot_dispersion_image(
     frequencies,
     velocities,
     title="Dispersion Image - Phase Shift Method",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_phase_shift.png')
+    save_path=os.path.join(FIGURES_DIR, 'dispersion', 'dispersion_phase_shift.png')
 )
 
 # ============================================
@@ -152,7 +149,7 @@ fig_picked = plot_dispersion_image(
     velocities,
     picked_curve=picked_velocities,
     title="Dispersion Image with Automatically Picked Curve",
-    save_path=os.path.join(FIGURES_DIR, 'dispersion_picked_auto.png')
+    save_path=os.path.join(FIGURES_DIR, 'dispersion', 'dispersion_picked_auto.png')
 )
 
 # Save picked curve
@@ -299,10 +296,10 @@ print("\n" + summary)
 print(f"Summary saved to: {summary_file}")
 
 print("\n" + "=" * 60)
-print("PHASE 4 COMPLETE: Dispersion Analysis")
+print("DISPERSION ANALYSIS COMPLETE")
 print("=" * 60)
 print("\nGenerated files:")
 print(f"  - {len(glob.glob(os.path.join(FIGURES_DIR, 'dispersion*.png')))} figures")
 print(f"  - 1 dispersion curve data file")
 print(f"  - 1 analysis summary")
-print("\nReady for Phase 5: Inversion!")
+print("\nReady for: Inversion!")

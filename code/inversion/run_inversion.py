@@ -1,8 +1,5 @@
-# notebooks/04_inversion.ipynb
-# Or: code/inversion/run_inversion.py
-
 """
-Phase 5: Inversion for Vs Profile
+Inversion for Vs Profile
 Invert dispersion curve to obtain shear-wave velocity profile
 """
 
@@ -53,15 +50,42 @@ print(f"  Velocity range: {observed_velocities.min():.1f} - {observed_velocities
 print(f"  Mean uncertainty: {uncertainties.mean():.1f} m/s")
 
 # Plot observed dispersion curve
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.errorbar(frequencies, observed_velocities, yerr=uncertainties,
-            fmt='ro-', capsize=4, capthick=2, markersize=6,
-            linewidth=2, label='Observed')
-ax.set_xlabel('Frequency (Hz)', fontsize=12, fontweight='bold')
-ax.set_ylabel('Phase Velocity (m/s)', fontsize=12, fontweight='bold')
-ax.set_title('Observed Dispersion Curve', fontsize=14, fontweight='bold')
-ax.grid(True, alpha=0.3)
-ax.legend()
+fig, ax = plt.subplots(figsize=(14, 7))
+
+# Plot uncertainty as filled region (cleaner than error bars on every point)
+ax.fill_between(frequencies, 
+                observed_velocities - uncertainties, 
+                observed_velocities + uncertainties,
+                alpha=0.3, color='red', label='Uncertainty (±1σ)')
+
+# Plot the dispersion curve line
+ax.plot(frequencies, observed_velocities, 'r-', linewidth=2.5, 
+        label='Observed Dispersion Curve', zorder=3)
+
+# Plot markers at reduced frequency (every 10th point) for clarity
+marker_step = 10
+ax.plot(frequencies[::marker_step], observed_velocities[::marker_step], 
+        'ro', markersize=7, markeredgewidth=1.5, markeredgecolor='darkred',
+        zorder=4)
+
+# Formatting
+ax.set_xlabel('Frequency (Hz)', fontsize=13, fontweight='bold')
+ax.set_ylabel('Phase Velocity (m/s)', fontsize=13, fontweight='bold')
+ax.set_title('Observed Fundamental Mode Dispersion Curve', 
+             fontsize=15, fontweight='bold', pad=15)
+
+# Adjust x-axis for better spacing
+ax.set_xlim(frequencies.min() - 1, frequencies.max() + 1)
+ax.set_ylim(observed_velocities.min() - 50, observed_velocities.max() + 50)
+
+# Grid and legend
+ax.grid(True, alpha=0.4, linestyle='--', linewidth=0.8)
+ax.legend(loc='upper right', fontsize=11, framealpha=0.9)
+
+# Add minor ticks for better readability
+ax.minorticks_on()
+ax.grid(True, which='minor', alpha=0.2, linestyle=':')
+
 plt.tight_layout()
 plt.savefig(os.path.join(FIGURES_DIR, 'inversion', 'observed_dispersion.png'), 
             dpi=300, bbox_inches='tight')
@@ -485,6 +509,6 @@ print("\n" + summary)
 print(f"Summary saved to: {summary_file}")
 
 print("\n" + "=" * 60)
-print("PHASE 5 COMPLETE: Inversion for Vs Profile")
+print("INVERSION COMPLETE: Vs Profile Obtained")
 print("=" * 60)
-print("\nProceed to Phase 6: Vs30 Calculation and Site Classification")
+print("\nReady for: Vs30 Calculation and Site Classification")
