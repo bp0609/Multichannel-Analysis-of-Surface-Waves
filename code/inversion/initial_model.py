@@ -8,7 +8,7 @@ import numpy as np
 from forward_model import LayeredEarthModel
 
 def create_initial_model(n_layers=4, method='linear', 
-                        vs_range=(200, 600), thickness_range=(5, 15)):
+                        vs_range=(200, 600), thickness_range=(2, 5)):
     """
     Create initial earth model for inversion
     
@@ -95,8 +95,8 @@ def create_initial_model_from_dispersion(frequencies, velocities,
     # Create layer boundaries
     layer_depths = np.linspace(0, min(depth_max, depths.max()), n_layers + 1)
     thickness = np.diff(layer_depths)
-    # Ensure minimum thickness of 2m for all layers except half-space
-    thickness = np.maximum(thickness, 2.0)
+    # Ensure thickness is between 2m and 5m for all layers except half-space
+    thickness = np.clip(thickness, 2.0, 5.0)
     thickness = np.append(thickness, 0)  # Add half-space
     
     # Estimate Vs for each layer

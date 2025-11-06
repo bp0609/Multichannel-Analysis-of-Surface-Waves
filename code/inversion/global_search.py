@@ -59,6 +59,10 @@ def monte_carlo_inversion(frequencies, observed_velocities, n_models=1000,
         vs_min, vs_max = vs_bounds[0]
         h_min, h_max = h_bounds[0]
     
+        # Constrain first layer thickness to prevent huge shallow layers
+    # Maximum first layer thickness should be reasonable (e.g., 10m)
+    max_first_layer_thickness = min(10.0, h_max)
+    
     # Calculate weights
     weights = None
     if uncertainties is not None:
@@ -80,6 +84,8 @@ def monte_carlo_inversion(frequencies, observed_velocities, n_models=1000,
         vs = np.sort(vs)  # Ensure increasing velocity (optional)
         
         thickness = np.random.uniform(h_min, h_max, n_layers)
+        # Constrain first layer thickness to prevent huge shallow layer
+        thickness[0] = np.random.uniform(h_min, max_first_layer_thickness)
         thickness[-1] = 0  # Half-space
         
         model = LayeredEarthModel(thickness, vs)
@@ -93,7 +99,19 @@ def monte_carlo_inversion(frequencies, observed_velocities, n_models=1000,
             valid = ~np.isnan(residuals)
             
             if np.sum(valid) > 0:
-                misfit = np.sqrt(np.sum(weights[valid] * residuals[valid]**2))
+                rms = np.sqrt(np.sum(weights[valid] * residuals[valid]**2))
+                
+                # Add penalty for unrealistic layer distributions
+                # Compute fraction of top 30m from first layer
+                depth_30m = min(30.0, thickness[0] if thickness[0] > 0 else 30.0)
+                frac_from_first_layer = depth_30m / 30.0 if thickness[0] >= 30.0 else thickness[0] / 30.0
+                
+                penalty = 0.0
+                if frac_from_first_layer > 0.9:
+                    # Mild penalty for >90% of the top 30m being a single layer
+                    penalty = 0.1 * rms
+                
+                misfit = rms + penalty
             else:
                 misfit = np.inf
         except:

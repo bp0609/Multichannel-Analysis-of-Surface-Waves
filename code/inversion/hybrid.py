@@ -68,7 +68,12 @@ def hybrid_inversion(frequencies, observed_velocities, n_layers=4,
         print("STAGE 2: Local Refinement")
         print("-" * 60)
     
-    final_model, result, rms_error = invert_least_squares(
+    # Keep a copy of the seed model and its RMS
+    seed_model = mc_model
+    seed_rms = mc_misfit
+    
+    # Run local refinement
+    refined_model, result, refined_rms = invert_least_squares(
         frequencies, observed_velocities,
         initial_model=mc_model,
         bounds=bounds,
@@ -77,12 +82,28 @@ def hybrid_inversion(frequencies, observed_velocities, n_layers=4,
         verbose=verbose
     )
     
+    # Accept refinement only if it improves RMS (or is within a tiny tolerance)
+    improvement_tol = 1e-6  # small tolerance
+    if refined_rms + improvement_tol < seed_rms:
+        final_model = refined_model
+        final_rms = refined_rms
+        accepted = "refined"
+    else:
+        final_model = seed_model
+        final_rms = seed_rms
+        accepted = "seed"
+    
     if verbose:
         print("\n" + "=" * 60)
         print("HYBRID INVERSION COMPLETE")
         print("=" * 60)
-        print(f"\nMonte Carlo RMS: {mc_misfit:.2f} m/s")
-        print(f"Final RMS: {rms_error:.2f} m/s")
-        print(f"Improvement: {((mc_misfit - rms_error) / mc_misfit * 100):.1f}%")
+        print(f"\nMonte Carlo (seed) RMS: {seed_rms:.2f} m/s")
+        print(f"Refined RMS: {refined_rms:.2f} m/s")
+        print(f"Final RMS: {final_rms:.2f} m/s")
+        print(f"Hybrid candidate accepted: {accepted}")
+        if accepted == "refined":
+            print(f"Improvement: {((seed_rms - final_rms) / seed_rms * 100):.1f}%")
+        else:
+            print(f"Refinement did not improve misfit - keeping Monte Carlo result")
     
-    return final_model, mc_model, rms_error
+    return final_model, mc_model, final_rms
