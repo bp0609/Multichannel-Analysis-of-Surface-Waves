@@ -272,27 +272,31 @@ n_vels = 500           # Velocity sampling points
 #### 1. **Least-Squares Inversion**
 - Method: Damped iterative least-squares (Levenberg-Marquardt)
 - Objective: Minimize data misfit with regularization
-- Result: RMS error = 72.72 m/s, Vs30 = 309.4 m/s
+- Result: RMS error = 79.36 m/s, Vs30 = 309.0 m/s
 
-#### 2. **Monte Carlo Global Search**
+#### 2. **Monte Carlo Global Search (FINAL)**
 - Method: Random sampling with acceptance criteria
 - Models tested: 1000
 - Acceptable models: 100 (RMS < threshold)
-- Best result: RMS error = 37.80 m/s, Vs30 = 286.7 m/s
+- Best result: **RMS error = 38.32 m/s, Vs30 = 317.5 m/s**
 
-#### 3. **Hybrid Approach (FINAL)**
+#### 3. **Hybrid Approach**
 - Combine global search exploration with local optimization
-- Result: **RMS error = 77.62 m/s, Vs30 = 287.6 m/s**
+- Result: RMS error = 39.67 m/s, Vs30 = 328.8 m/s
 
 **Earth Model Parameterization**:
-- Number of layers: 6 (5 layers + half-space)
+- Number of layers: 9 (8 layers + half-space)
+- Layer thickness constraints: 2-10 m (prevents unrealistic thick layers)
 - Free parameters: Vs, layer thickness
 - Constrained parameters: Vp (from Vs using empirical relations), density (ρ)
 
+**Model Selection**: Final model chosen based on **minimum RMS error** across all methods
+
 **Outputs**:
-- `vs_profile_final.txt`: Final layered earth model (6 layers)
+- `vs_profile_final.txt`: Final layered earth model (9 layers)
 - `inversion/observed_dispersion.png`: Observed dispersion with uncertainty (IMPROVED)
-- `inversion/result_hybrid.png`: Best-fit model and dispersion
+- `inversion/result_monte_carlo.png`: Best-fit model and dispersion (FINAL)
+- `inversion/result_hybrid.png`: Hybrid inversion result
 - `inversion/comparison_all.png`: All three methods compared
 - `inversion/uncertainty_envelope.png`: Ensemble uncertainty from 100 models
 - `inversion_summary.txt`: Inversion report
@@ -309,18 +313,15 @@ $$\text{Vs30} = \frac{30}{\sum_{i=1}^{n} \frac{h_i}{V_{si}}}$$
 where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$.
 
 **Statistical Analysis**:
-- Vs30 = **287.6 m/s** (final model)
-- Vs30 mean = 287.5 m/s (from 100 Monte Carlo models)
-- Vs30 std dev = 30.6 m/s
-- 95% Confidence Interval = [227.6, 347.5] m/s
-- Coefficient of Variation = 10.6%
+- Vs30 = **317.5 m/s** (final model - Monte Carlo best)
+- Vs30 uncertainty: from ensemble of 100 acceptable models
+- Coefficient of Variation: ~12-13%
 
 **Other Metrics**:
-- Vs10 = 287.6 m/s
-- Vs15 = 287.6 m/s
-- Vs20 = 287.6 m/s
-- Surface Vs = 287.6 m/s
-- Maximum Vs = 1309.8 m/s (half-space)
+- Vs10, Vs15, Vs20: Time-averaged velocities to 10, 15, 20 m depth
+- Surface Vs: Top layer shear-wave velocity
+- Maximum Vs: Half-space velocity
+- Depth to bedrock: Depth where Vs > 760 m/s
 
 **Site Classifications**:
 
@@ -350,16 +351,21 @@ where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$
 
 | Layer | Thickness (m) | Vs (m/s) | Vp (m/s) | Density (g/cm³) |
 |-------|---------------|----------|----------|-----------------|
-| 1 | 37.33 | 287.6 | 497.5 | 0.26 |
-| 2 | 9.66 | 712.0 | 1231.7 | 0.33 |
-| 3 | 29.46 | 744.2 | 1287.4 | 0.33 |
-| 4 | 14.82 | 958.9 | 1658.9 | 0.35 |
-| 5 | 20.10 | 1059.6 | 1833.2 | 0.36 |
-| 6 | ∞ (half-space) | 1309.8 | 2266.0 | 0.38 |
+| 1 | 9.48 | 287.7 | 497.7 | 0.26 |
+| 2 | 9.25 | 303.6 | 525.2 | 0.26 |
+| 3 | 7.92 | 322.0 | 557.1 | 0.27 |
+| 4 | 4.35 | 517.0 | 894.4 | 0.30 |
+| 5 | 6.71 | 671.2 | 1161.1 | 0.32 |
+| 6 | 3.62 | 896.6 | 1551.1 | 0.35 |
+| 7 | 8.76 | 1324.9 | 2292.0 | 0.38 |
+| 8 | 2.47 | 1378.4 | 2384.7 | 0.39 |
+| 9 | ∞ (half-space) | 1442.9 | 2496.2 | 0.39 |
+
+**Total depth before half-space: 52.56 m** (well exceeds 30 m required for Vs30)
 
 ### Key Findings
 
-✅ **Vs30 = 287.6 m/s** → **NEHRP Site Class D (Stiff Soil)**
+✅ **Vs30 = 317.5 m/s** → **NEHRP Site Class D (Stiff Soil)**
 
 ✅ **Engineering Implications**:
 - Moderate amplification of seismic ground motions expected
@@ -369,11 +375,12 @@ where $h_i$ is layer thickness and $V_{si}$ is shear-wave velocity for layer $i$
 - Site-specific response analysis recommended for critical facilities
 
 ✅ **Quality Metrics**:
-- Maximum investigation depth: ~120 m (from dispersion wavelength analysis)
-- Coverage for Vs30 calculation: **ADEQUATE** (well exceeds 30 m requirement)
-- Inversion RMS error: 77.62 m/s (~12% relative error)
+- Maximum investigation depth: ~52.6 m (from layer structure)
+- Coverage for Vs30 calculation: **EXCELLENT** (well exceeds 30 m requirement)
+- Inversion RMS error: 38.32 m/s (~10% relative error)
 - Uncertainty analysis: 100 Monte Carlo models evaluated
-- Vs30 uncertainty: ±30.6 m/s (1σ), CoV = 10.6%
+- Layer thickness constrained: 2-10 m (prevents unrealistic uniform layers)
+- Model selection: Automatic selection based on minimum RMS error
 
 ---
 
@@ -432,8 +439,8 @@ All figures are saved in `results/figures/` with publication-quality resolution 
 - `observed_dispersion.png` - **Observed dispersion curve with uncertainty band** (IMPROVED: 14×7 figure, filled uncertainty region, cleaner spacing)
 - `initial_model.png` - Initial model and theoretical dispersion
 - `result_least_squares.png` - Least-squares inversion result
-- `result_monte_carlo.png` - Monte Carlo global search result
-- `result_hybrid.png` - Hybrid inversion result (FINAL)
+- `result_monte_carlo.png` - Monte Carlo global search result (FINAL - lowest RMS)
+- `result_hybrid.png` - Hybrid inversion result
 - `comparison_all.png` - Comparison of all three inversion methods
 - `uncertainty_envelope.png` - Uncertainty envelope from 100 Monte Carlo models
 
