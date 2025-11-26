@@ -100,7 +100,7 @@ print("CREATING INITIAL MODEL")
 print("=" * 60)
 
 # Define number of layers
-n_layers = 5  # 4 layers + half-space
+n_layers = 8  # 7 layers + half-space (allows ~70m depth with 10m max thickness)
 
 # Method 1: Simple linear model
 initial_model_linear = create_initial_model(
@@ -145,7 +145,7 @@ bounds = define_parameter_bounds(
     vs_min=100,
     vs_max=1500,
     h_min=2,
-    h_max=40
+    h_max=10
 )
 
 print("\nParameter bounds:")
@@ -417,8 +417,30 @@ print("\n" + "=" * 60)
 print("SAVING FINAL MODEL")
 print("=" * 60)
 
-# Choose best model (hybrid typically best)
-final_model = model_hybrid
+# Select the best model based on minimum RMS error
+results = {
+    "least_squares": {"model": model_ls, "rms": rms_ls},
+    "monte_carlo_best": {"model": model_mc, "rms": misfit_mc},
+    "hybrid": {"model": model_hybrid, "rms": rms_hybrid}
+}
+
+# Find the method with the lowest RMS
+rms_items = [(k, v["rms"]) for k, v in results.items()]
+best_method, best_rms = min(rms_items, key=lambda x: x[1])
+final_model = results[best_method]["model"]
+
+print(f"\nSelected final model: {best_method} with RMS = {best_rms:.4f} m/s")
+print(f"  Least-Squares RMS: {rms_ls:.4f} m/s")
+print(f"  Monte Carlo RMS: {misfit_mc:.4f} m/s")
+print(f"  Hybrid RMS: {rms_hybrid:.4f} m/s")
+
+# Calculate Vs30 using the consistent function from calculate_vs30 module
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'vs30'))
+from calculate_vs30 import calculate_vs30
+final_vs30 = calculate_vs30(final_model)
+final_vs30_rounded = round(final_vs30, 1)
+
+print(f"\nFinal model Vs30 = {final_vs30_rounded:.1f} m/s")
 
 # Save model to file
 model_file = os.path.join(DISPERSION_DIR, 'vs_profile_final.txt')
@@ -453,17 +475,21 @@ Inversion Results:
   
   Least-Squares:
     - RMS error: {rms_ls:.2f} m/s
-    - Vs30: {model_ls.calculate_vs30():.1f} m/s
+    - Vs30: {calculate_vs30(model_ls):.1f} m/s
   
   Monte Carlo:
     - Best RMS error: {misfit_mc:.2f} m/s
-    - Vs30: {model_mc.calculate_vs30():.1f} m/s
+    - Vs30: {calculate_vs30(model_mc):.1f} m/s
     - Models tested: {len(all_models_mc)}
     - Acceptable models: {len(acceptable_models)}
   
-  Hybrid (FINAL):
+  Hybrid:
     - RMS error: {rms_hybrid:.2f} m/s
-    - Vs30: {model_hybrid.calculate_vs30():.1f} m/s
+    - Vs30: {calculate_vs30(model_hybrid):.1f} m/s
+
+  FINAL MODEL SELECTED: {best_method.upper()}
+    - RMS error: {best_rms:.2f} m/s
+    - Vs30: {final_vs30_rounded:.1f} m/s
 
 Final Model:
 {final_model}

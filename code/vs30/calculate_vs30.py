@@ -58,6 +58,49 @@ def calculate_vs30(model):
     return vs30
 
 
+def compute_vs_time_average(model_layers, depth=30.0):
+    """
+    Compute time-averaged Vs to arbitrary depth from layer list
+    Alternative interface that accepts raw layer data
+    
+    Parameters:
+    -----------
+    model_layers : list of tuples
+        List of (thickness, Vs) tuples. Last layer can have thickness=None or np.inf for half-space.
+    depth : float
+        Target depth in meters (default: 30.0)
+    
+    Returns:
+    --------
+    vsz : float
+        Time-averaged shear wave velocity to depth (m/s)
+    """
+    remaining = depth
+    travel_time = 0.0
+    
+    for h, vs in model_layers:
+        if remaining <= 1e-8:
+            break
+            
+        if h is None or (isinstance(h, float) and np.isinf(h)) or h == 0:
+            # Half-space - use all remaining depth
+            h_eff = remaining
+        else:
+            # Regular layer - use minimum of layer thickness and remaining depth
+            h_eff = min(h, remaining)
+        
+        travel_time += h_eff / vs
+        remaining -= h_eff
+    
+    # If depth not fully covered, extrapolate using last layer's Vs
+    if remaining > 1e-6:
+        last_vs = model_layers[-1][1]
+        travel_time += remaining / last_vs
+    
+    vsz = depth / travel_time
+    return vsz
+
+
 def calculate_vsz(model, depth_target):
     """
     Calculate time-averaged Vs to arbitrary depth
@@ -191,6 +234,28 @@ def propagate_vs30_uncertainty(acceptable_models):
     return vs30_mean, vs30_std, vs30_values
 
 
+def format_vs30(vs30_value, decimal_places=1):
+    """
+    Format Vs30 value with consistent rounding for reporting
+    
+    This ensures all printed and saved Vs30 values use the same formatting,
+    preventing inconsistencies like 287.5 vs 287.6 vs 288.
+    
+    Parameters:
+    -----------
+    vs30_value : float
+        Raw Vs30 value
+    decimal_places : int
+        Number of decimal places (default: 1)
+    
+    Returns:
+    --------
+    vs30_formatted : float
+        Consistently rounded Vs30 value
+    """
+    return round(vs30_value, decimal_places)
+
+
 if __name__ == "__main__":
     # Test
     from code.inversion.forward_model import LayeredEarthModel
@@ -207,6 +272,17 @@ if __name__ == "__main__":
     print("\nVs Statistics:")
     for key, value in stats.items():
         if value is not None:
-            print(f"  {key}: {value:.1f}")
+            if 'vs' in key.lower():
+                # Use consistent formatting for all Vs values
+                formatted_value = format_vs30(value)
+                print(f"  {key}: {formatted_value:.1f} m/s")
+            else:
+                print(f"  {key}: {value:.1f}")
         else:
             print(f"  {key}: Not found")
+    
+    # Demonstrate consistent formatting
+    print("\nConsistent Vs30 formatting examples:")
+    vs30_raw = calculate_vs30(model)
+    print(f"  Raw Vs30: {vs30_raw}")
+    print(f"  Formatted Vs30: {format_vs30(vs30_raw):.1f} m/s")

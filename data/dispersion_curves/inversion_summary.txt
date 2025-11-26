@@ -8,39 +8,46 @@ Observed Data:
   - Mean uncertainty: 16.5 m/s
 
 Inversion Results:
-  - Number of layers: 6
+  - Number of layers: 9
   
   Least-Squares:
-    - RMS error: 72.72 m/s
-    - Vs30: 309.4 m/s
+    - RMS error: 79.36 m/s
+    - Vs30: 309.0 m/s
   
   Monte Carlo:
-    - Best RMS error: 37.80 m/s
-    - Vs30: 286.7 m/s
+    - Best RMS error: 38.32 m/s
+    - Vs30: 317.5 m/s
     - Models tested: 1000
     - Acceptable models: 100
   
-  Hybrid (FINAL):
-    - RMS error: 77.62 m/s
-    - Vs30: 287.6 m/s
+  Hybrid:
+    - RMS error: 39.67 m/s
+    - Vs30: 328.8 m/s
+
+  FINAL MODEL SELECTED: MONTE_CARLO_BEST
+    - RMS error: 38.32 m/s
+    - Vs30: 317.5 m/s
 
 Final Model:
 Layered Earth Model:
 ------------------------------------------------------------
 Layer    Thickness(m)    Vs(m/s)      Vp(m/s)      Rho(g/cm³)  
 ------------------------------------------------------------
-1        37.33           287.6        497.5        0.26        
-2        9.66            712.0        1231.7       0.33        
-3        29.46           744.2        1287.4       0.33        
-4        14.82           958.9        1658.9       0.35        
-5        20.10           1059.6       1833.2       0.36        
-6        ∞ (half-space)  1309.8       2266.0       0.38        
+1        9.48            287.7        497.7        0.26        
+2        9.25            303.6        525.2        0.26        
+3        7.92            322.0        557.1        0.27        
+4        4.35            517.0        894.4        0.30        
+5        6.71            671.2        1161.1       0.32        
+6        3.62            896.6        1551.1       0.35        
+7        8.76            1324.9       2292.0       0.38        
+8        2.47            1378.4       2384.7       0.39        
+9        ∞ (half-space)  1442.9       2496.2       0.39        
 ------------------------------------------------------------
-Vs30 = 287.6 m/s
+Vs30 = 317.5 m/s
 
 
 Output Files:
-  - Model: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/vs_profile_final.txt
-  - Figures: /Users/devrev/Downloads/repos/GEOP/Multichannel-Analysis-of-Surface-Waves/results/figures/inversion/
+  - Model: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/data/dispersion_curves/vs_profile_final.txt
+  - Figures: /home/devil/Documents/Courses/GeoPhy/Multichannel-Analysis-of-Surface-Waves/results/figures/inversion/
 
-Date: 2025-10-31T13:18:32
+Date: 2025-11-06T16:36:19
